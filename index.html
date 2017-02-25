@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Project One</title>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="http://d3js.org/topojson.v2.min.js"></script>
+</head>
+<body>
+<p>Testing</p>
+<script type="text/javascript">
+var dataset;
+/* This function returns an array countryData containing an object for each country with feilds for each variable (variable names are in lines 23,26,29,32,35,38)*/
+d3.csv("large-tabular.csv", function(data) {
+        dataset=data;
+        nestedData = d3.nest()
+        .key(function (d){ return d.REF_AREA;}).entries(data);
+
+        countryData = nestedData.map(function(country){
+        	var result = {Country: country.key};
+
+        	country.values.forEach(function (d){
+        		if (d.INDICATOR == "SM_POP_NETM") {
+        			result.NetMigration = d.OBS_VALUE;
+        		}
+        		else if(d.INDICATOR == "SM_POP_NMRT"){
+        			result.NetMigRate = d.OBS_VALUE;
+        		}
+        		else if(d.INDICATOR == "SP_POP_CHGE"){
+        			result.PopChange = d.OBS_VALUE;
+        		}
+        		else if(d.INDICATOR == "SP_POP_TOTL"){
+        			result.PopTotal = d.OBS_VALUE;
+        		}
+        		else if(d.INDICATOR == "SP_DYN_LE00"){
+        			result.LifeExpect = d.OBS_VALUE;
+        		}
+        		else if(d.INDICATOR == "SH_DYN_IMRT"){
+        			result.InfantMort = d.OBS_VALUE;
+        		}
+        	});
+        	// Right Now these values are giving the 2020 value only
+        	return result;
+        });
+
+
+});
+</script>
+
+</body>
+</html>
