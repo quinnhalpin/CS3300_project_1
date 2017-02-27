@@ -1,49 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Project One</title>
-	<script src="https://d3js.org/d3.v4.min.js"></script>
-	<script src="http://d3js.org/topojson.v2.min.js"></script>
+        <title>Project One</title>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <script src="http://d3js.org/topojson.v2.min.js"></script>
 </head>
+<style>
+        svg { border: solid #ccc 1px; }
+</style>
 <body>
 <p>Testing</p>
+<svg width = "400" height = "400">
 <script type="text/javascript">
-var dataset;
+var dataset, nestedData, rawData, countries;
+var projection = d3.geoMercator().scale(125);
+var pathGenerator2 = d3.geoPath().projection(projection);
+var svg = d3.select("svg");
 /* This function returns an array countryData containing an object for each country with feilds for each variable (variable names are in lines 23,26,29,32,35,38)*/
-d3.csv("large-tabular.csv", function(data) {
-        dataset=data;
+
+d3.queue()
+.defer(d3.csv, "large-tabular.csv")
+.defer(d3.json, "world-50m.json")
+.await(done_function);
+
+var parseLargeTable = function(row) {   
+};
+var parseWorld = function(row){
+}; 
+
+function done_function(error, csv_data, world_json_data){
+        dataset= csv_data;
         nestedData = d3.nest()
-        .key(function (d){ return d.REF_AREA;}).entries(data);
+        .key(function (d){ return d.REF_AREA;}).entries(csv_data);
 
         countryData = nestedData.map(function(country){
-        	var result = {Country: country.key};
-
-        	country.values.forEach(function (d){
-        		if (d.INDICATOR == "SM_POP_NETM") {
-        			result.NetMigration = d.OBS_VALUE;
-        		}
-        		else if(d.INDICATOR == "SM_POP_NMRT"){
-        			result.NetMigRate = d.OBS_VALUE;
-        		}
-        		else if(d.INDICATOR == "SP_POP_CHGE"){
-        			result.PopChange = d.OBS_VALUE;
-        		}
-        		else if(d.INDICATOR == "SP_POP_TOTL"){
-        			result.PopTotal = d.OBS_VALUE;
-        		}
-        		else if(d.INDICATOR == "SP_DYN_LE00"){
-        			result.LifeExpect = d.OBS_VALUE;
-        		}
-        		else if(d.INDICATOR == "SH_DYN_IMRT"){
-        			result.InfantMort = d.OBS_VALUE;
-        		}
-        	});
-        	// Right Now these values are giving the 2020 value only
-        	return result;
+                var result = {Country: country.key};
+                country.values.forEach(function (d){
+                        if (d.INDICATOR == "SM_POP_NETM") {
+                                result.NetMigration = d.OBS_VALUE;
+                        }
+                        else if(d.INDICATOR == "SM_POP_NMRT"){
+                                result.NetMigRate = d.OBS_VALUE;
+                        }
+                        else if(d.INDICATOR == "SP_POP_CHGE"){
+                                result.PopChange = d.OBS_VALUE;
+                        }
+                        else if(d.INDICATOR == "SP_POP_TOTL"){
+                                result.PopTotal = d.OBS_VALUE;
+                        }
+                        else if(d.INDICATOR == "SP_DYN_LE00"){
+                                result.LifeExpect = d.OBS_VALUE;
+                        }
+                        else if(d.INDICATOR == "SH_DYN_IMRT"){
+                                result.InfantMort = d.OBS_VALUE;
+                        }
+                });
+                // Right Now these values are giving the 2020 value only
+                return result;
         });
-
-
-});
+        console.log(countryData)
+        console.log("in done!")
+        console.log(world_json_data)
+        var scaleOrdinal = d3.scaleOrdinal(d3.schemeCategory20c);
+        rawData = world_json_data;
+        countries = topojson.feature(rawData, rawData.objects.countries);
+        projection.fitExtent([[-1700,-600], [4*svg.attr("width"), 4*svg.attr("height")]], countries);
+        pathGenerator2 = d3.geoPath().projection(projection);
+        var paths = svg.selectAll("path.country").data(countries.features);
+        
+        paths.enter().append("path").attr("class", "country")
+                .merge(paths)
+                .transition().duration(1000)
+                .attr("d", function(country){
+                        return pathGenerator2(country);
+                })
+                .style("fill", function(country, ind) {
+                        return scaleOrdinal(ind+5 % 20);
+                });
+}
 </script>
 
 </body>
