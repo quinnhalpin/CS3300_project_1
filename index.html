@@ -102,6 +102,11 @@ function done_function(error, csv_data, world_json_data, pop_area){
         //console.log(countryData)
         //console.log(world_json_data)
         var scaleOrdinal = d3.scaleOrdinal(d3.schemeCategory20c);
+        var monochromaticColors = ['#46ff03','#3b9606','#186901'];
+        var complementaryColors = ['#e9a3c9','#f7f7f7','#a1d76a'];
+        // Brown and blue['#1e38ab','#030200','#a86420'];
+        //Green and blue['#46ff03','#030200','#db7f15'];
+        // Green and red [#5bad0e,'#030200',#a80e59];
         rawData = world_json_data;
         countries = topojson.feature(rawData, rawData.objects.countries);
         id_in_dict = function(val, arr){return Object.values(arr).reduce((a,x) => a || val == x.id, false)}
