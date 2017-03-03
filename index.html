@@ -17,10 +17,15 @@
 </div>
 <div id = "p2">
         <p>
-                Showcasing country area
+                Closer Look
         </p>
 </div>
 <div id = "p3">
+        <p>
+                Showcasing country area
+        </p>
+</div>
+<div id = "p4">
         <p>
                 Path of every country
         </p>
@@ -28,12 +33,14 @@
 <script type="text/javascript">
 var dataset, nestedData, rawData, countries, popAreaData;
 var projection = d3.geoMercator().scale(125);
+var projection_out = d3.geoMercator().scale(300);
 var projection3 = d3.geoMercator().scale(300);
 var pathGenerator2 = d3.geoPath().projection(projection);
 var pathGenerator3 = d3.geoPath().projection(projection3);
 var svg = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
-var svg2 = d3.select("#p2").append("svg").attr("width", 500).attr("height", 500);
-var svg3 = d3.select("#p3").append("svg").attr("width", 1000).attr("height", 1000);
+var svg2 = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
+var svg3 = d3.select("#p3").append("svg").attr("width", 500).attr("height", 500);
+var svg4 = d3.select("#p4").append("svg").attr("width", 1000).attr("height", 1000);
 
 /* This function returns an array countryData containing an object for each country with feilds for each variable (variable names are in lines 23,26,29,32,35,38)*/
 
@@ -105,9 +112,23 @@ function done_function(error, csv_data, world_json_data, pop_area){
         rawData = world_json_data;
         countries = topojson.feature(rawData, rawData.objects.countries);
         id_in_dict = function(val, arr){return Object.values(arr).reduce((a,x) => a || val == x.id, false)}
-        projection.fitExtent([[-2000,-900], [4*svg.attr("width"), 4*svg.attr("height")]], countries);
+        projection_out.fitExtent([[-1500,-500], [3*svg.attr("width"), 3*svg.attr("height")]], countries);
+        projection.fitExtent([[-2900,-1200], [5*svg2.attr("width"), 5*svg2.attr("height")]], countries);
+        pathGenerator_out = d3.geoPath().projection(projection_out);
         pathGenerator2 = d3.geoPath().projection(projection);
-        var paths = svg.selectAll("path.country").data(countries.features);
+        var path_all = svg.selectAll("path.country").data(countries.features);
+        
+        path_all.enter().append("path").attr("class", "country")
+                .merge(path_all)
+                .attr("d", function(country){ 
+                        return pathGenerator_out(country);
+                })
+                .attr("id", function(country){return country.id;})
+                .style("fill", function(country, ind) {
+                        return scaleOrdinal(ind+5 % 20);
+                });
+        
+        var paths = svg2.selectAll("path.country").data(countries.features);
         
         paths.enter().append("path").attr("class", "country")
                 .merge(paths)
@@ -134,7 +155,7 @@ function done_function(error, csv_data, world_json_data, pop_area){
         
         popAreaData.forEach(function(d){
                 //console.log(d);
-                g = svg2.append("g").attr("transform", "translate(" + xScale(i%4) + ", " + yScale(Math.floor(i/4)) + ")")
+                g = svg3.append("g").attr("transform", "translate(" + xScale(i%4) + ", " + yScale(Math.floor(i/4)) + ")")
                         .attr("cx", xScale(i%4))
                         .attr("cy", yScale(Math.floor(i/4)));
                 g.append("circle").attr("r",rScale(Math.sqrt(d.areaInSqKm)))
@@ -147,10 +168,10 @@ function done_function(error, csv_data, world_json_data, pop_area){
                         .attr("y", -20);
                 i += 1;
         });
-        projection3.fitExtent([[-2800,-1200], [5*svg3.attr("width"), 5*svg3.attr("height")]], countries);
+        projection3.fitExtent([[-2800,-1200], [5*svg4.attr("width"), 5*svg4.attr("height")]], countries);
         pathGenerator3 = d3.geoPath().projection(projection3);
-        var paths_special = svg3.selectAll("path.country").data(countries.features);
-        var circles_special = svg3.selectAll("circles").data(countries.features);
+        var paths_special = svg4.selectAll("path.country").data(countries.features);
+        var circles_special = svg4.selectAll("circles").data(countries.features);
         ind_for_id = function(val, arr){return Object.values(arr).reduce((a,x) => a || x.ind , false)}
         var xScaleCountry = d3.scaleLinear().domain([0,3]).range([100,900]);
         var yScaleCountry = d3.scaleLinear().domain([0,3]).range([100,900]);
@@ -158,15 +179,9 @@ function done_function(error, csv_data, world_json_data, pop_area){
         paths_special.enter().append("path").attr("class", "country")
                 .merge(paths)
                 .attr("d", function(country){ 
-                        //console.log(d3.geoPath().centroid(country))
                         if (id_in_dict(country.id, small_country_arr)){
                                 return pathGenerator3(country);
                         }
-
-                        // if (id_in_dict(country.id, country_id)){
-                        //         //console.log(pathGenerator3(country))
-                        //         return pathGenerator3(country);
-                        // }
                 })
                 .attr("transform", function(country, id) {
                         // [x,y] = [ - x_cent + xScaleCountry(id), - y_cent]
