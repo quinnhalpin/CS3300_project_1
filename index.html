@@ -9,26 +9,67 @@
         svg { border: solid #ccc 1px; }
 </style>
 <body>
-<p>Testing</p>
-<svg width = "400" height = "400">
+<div id = "p1">
+        <p>
+                Testing.
+                Sources: peric.github.io/GetCountries/
+        </p>
+</div>
+<div id = "p2">
+        <p>
+                Showcasing country area
+        </p>
+</div>
+<div id = "p3">
+        <p>
+                Path of every country
+        </p>
+</div>
 <script type="text/javascript">
-var dataset, nestedData, rawData, countries;
+var dataset, nestedData, rawData, countries, popAreaData;
 var projection = d3.geoMercator().scale(125);
+var projection3 = d3.geoMercator().scale(300);
 var pathGenerator2 = d3.geoPath().projection(projection);
-var svg = d3.select("svg");
+var pathGenerator3 = d3.geoPath().projection(projection3);
+var svg = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
+var svg2 = d3.select("#p2").append("svg").attr("width", 500).attr("height", 500);
+var svg3 = d3.select("#p3").append("svg").attr("width", 1000).attr("height", 1000);
+
 /* This function returns an array countryData containing an object for each country with feilds for each variable (variable names are in lines 23,26,29,32,35,38)*/
 
 d3.queue()
 .defer(d3.csv, "large-tabular.csv")
 .defer(d3.json, "world-50m.json")
+.defer(d3.json, "middle_east_pop_area.json")
 .await(done_function);
-
-var parseLargeTable = function(row) {   
+scale_country_id = {
+        48: 7,
+        818: .5,
+}
+small_country_arr = {
+        "Bahrain": {"ind":0, "id":48}
+}
+country_id = {
+        
+                "Bahrain": {"ind":0, "id":48}, 
+                "Egypt": {"ind":1, "id": 818}, 
+                "Iran": {"ind":2, "id": 364}, 
+                "Iraq": {"ind":3, "id": 368}, 
+                "Israel": {"ind":4, "id": 376}, 
+                "Jordan": {"ind":5, "id": 400}, 
+                "Kuwait": {"ind":6, "id": 414}, 
+                "Lebanon": {"ind":7, "id": 422}, 
+                "Oman": {"ind":8, "id": 512}, 
+                "Palestine": {"ind":9, "id": 275}, 
+                "Qatar": {"ind":10, "id": 634}, 
+                "Saudi Arabia": {"ind":11, "id": 682}, 
+                "Syria": {"ind":12, "id": 760}, 
+                "Turkey":{"ind":13, "id": 792}, 
+                "United Arab Emirates": {"ind": 14, "id": 784}, 
+                "Yemen": {"ind":15, "id": 887}      
 };
-var parseWorld = function(row){
-}; 
-
-function done_function(error, csv_data, world_json_data){
+id_to_ind = [48,818,364,368,376,400,414,422,512,275,634,682,760,792,784,887];
+function done_function(error, csv_data, world_json_data, pop_area){
         dataset= csv_data;
         nestedData = d3.nest()
         .key(function (d){ return d.REF_AREA;}).entries(csv_data);
@@ -58,26 +99,117 @@ function done_function(error, csv_data, world_json_data){
                 // Right Now these values are giving the 2020 value only
                 return result;
         });
-        console.log(countryData)
-        console.log("in done!")
-        console.log(world_json_data)
+        //console.log(countryData)
+        //console.log(world_json_data)
         var scaleOrdinal = d3.scaleOrdinal(d3.schemeCategory20c);
         rawData = world_json_data;
         countries = topojson.feature(rawData, rawData.objects.countries);
-        projection.fitExtent([[-1700,-600], [4*svg.attr("width"), 4*svg.attr("height")]], countries);
+        id_in_dict = function(val, arr){return Object.values(arr).reduce((a,x) => a || val == x.id, false)}
+        projection.fitExtent([[-2000,-900], [4*svg.attr("width"), 4*svg.attr("height")]], countries);
         pathGenerator2 = d3.geoPath().projection(projection);
         var paths = svg.selectAll("path.country").data(countries.features);
         
         paths.enter().append("path").attr("class", "country")
                 .merge(paths)
-                .transition().duration(1000)
-                .attr("d", function(country){
-                        return pathGenerator2(country);
+                .attr("d", function(country){ 
+                        if (id_in_dict(country.id, country_id)){
+                                return pathGenerator2(country);
+                        }
+                       
                 })
+                .attr("id", function(country){return country.id;})
                 .style("fill", function(country, ind) {
                         return scaleOrdinal(ind+5 % 20);
                 });
+        popAreaData = pop_area.countries;
+        popAreaData.length
+        var radiusScale = d3.scaleLinear().domain([0,9]).range([40, 170]);
+        var xScale = d3.scaleLinear().domain([0,3]).range([50, 450]);
+        var yScale = d3.scaleLinear().domain([0,3]).range([50, 450]);
+        var areaExtent = d3.extent(popAreaData,
+                function (d) { return Math.sqrt(d.areaInSqKm); });
+        //console.log(areaExtent)
+        var rScale = d3.scaleLinear().domain(areaExtent).range([10,3]);
+        i = 0;
+        
+        popAreaData.forEach(function(d){
+                //console.log(d);
+                g = svg2.append("g").attr("transform", "translate(" + xScale(i%4) + ", " + yScale(Math.floor(i/4)) + ")")
+                        .attr("cx", xScale(i%4))
+                        .attr("cy", yScale(Math.floor(i/4)));
+                g.append("circle").attr("r",rScale(Math.sqrt(d.areaInSqKm)))
+                        .style("fill", "red")
+                        .attr("opacity", .8);
+                g.append("text").style("font-size", "8pt")
+                        .text(d.countryName)
+                        .style("font-family", "Alegreya Sans")
+                        .attr("x", -15)
+                        .attr("y", -20);
+                i += 1;
+        });
+        projection3.fitExtent([[-2800,-1200], [5*svg3.attr("width"), 5*svg3.attr("height")]], countries);
+        pathGenerator3 = d3.geoPath().projection(projection3);
+        var paths_special = svg3.selectAll("path.country").data(countries.features);
+        var circles_special = svg3.selectAll("circles").data(countries.features);
+        ind_for_id = function(val, arr){return Object.values(arr).reduce((a,x) => a || x.ind , false)}
+        var xScaleCountry = d3.scaleLinear().domain([0,3]).range([100,900]);
+        var yScaleCountry = d3.scaleLinear().domain([0,3]).range([100,900]);
+        var placeScale = d3.scaleLinear().domain([0,1000]).range([0,143])
+        paths_special.enter().append("path").attr("class", "country")
+                .merge(paths)
+                .attr("d", function(country){ 
+                        //console.log(d3.geoPath().centroid(country))
+                        if (id_in_dict(country.id, small_country_arr)){
+                                return pathGenerator3(country);
+                        }
+
+                        // if (id_in_dict(country.id, country_id)){
+                        //         //console.log(pathGenerator3(country))
+                        //         return pathGenerator3(country);
+                        // }
+                })
+                .attr("transform", function(country, id) {
+                        // [x,y] = [ - x_cent + xScaleCountry(id), - y_cent]
+                        if (id_in_dict(country.id, small_country_arr)){
+                                [x_cent,y_cent] = projection3(d3.geoPath().centroid(country));
+                                console.log(x_cent, y_cent)
+                                x = -x_cent*scale_country_id[country.id];
+                                y= -y_cent*scale_country_id[country.id];
+                                console.log([x_cent,y_cent])
+                                size = popAreaData[id_to_ind.indexOf(country.id)].areaInSqKm;
+                                //console.log(size)
+                                // [x,y] = [xScaleCountry(id_to_ind.indexOf(country.id)%4),yScaleCountry(Math.floor((id_to_ind.indexOf(country.id))/4))]
+                                return "translate("+ x +","+ y +") scale("+scale_country_id[country.id]+") translate("+ 50 +","+ 50 +")";
+                                // return "translate("+ -x_cent*sizeScaleCountry(size) +","+ -y_cent*sizeScaleCountry(size) +") scale(" + sizeScaleCountry(size)+") translate("+ x +","+ y +") ";
+                        }
+                })
+                        // return "translate("+-x+","+-y+") translate(" + xScaleCountry(id%4) + "," + yScaleCountry(Math.floor(id/4))+")" ;})
+                .attr("id", function(country){return country.id;})
+                .style("fill", function(country, ind) {
+                        return scaleOrdinal(ind+5 % 20);
+                });
+         // circles_special.enter().append("circle").attr("class", "country")
+         //        .merge(paths)
+         //        .attr("r",20)
+         //        .attr("cx", function(country){
+         //                if (id_in_dict(country.id, country_id)){
+         //                        [x_cent,y_cent] = projection3(d3.geoPath().centroid(country));
+         //                        console.log(x_cent)
+         //                        return 110;
+         //                }
+         //                return 300;
+         //        })
+                        
+         //        .attr("cy", function(country){
+         //                if (id_in_dict(country.id, country_id)){
+         //                        [x_cent,y_cent] = projection3(d3.geoPath().centroid(country));
+         //                        return 100;
+         //                }
+         //                return 300;
+         //        });
+
 }
+
 </script>
 
 </body>
