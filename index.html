@@ -84,6 +84,7 @@ function done_function(error, csv_data, world_json_data, pop_area) {
         countryData = nestedData.map(function(country){
                 var result = {Country: country.key};
                 country.values.forEach(function (d){
+                    if(d.TIME_PERIOD =="2015"){
                         if (d.INDICATOR == "SM_POP_NETM") {
                             result.NetMigration = d.OBS_VALUE;
                         }
@@ -105,6 +106,7 @@ function done_function(error, csv_data, world_json_data, pop_area) {
                         else if(d.INDICATOR == "ID"){
                             result.CountryId = d.OBS_VALUE;
                         }
+                    }   
                 });
                 // Right Now these values are giving the 2020 value only
                 return result;
