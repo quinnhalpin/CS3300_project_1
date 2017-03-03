@@ -111,14 +111,14 @@ function done_function(error, csv_data, world_json_data, pop_area) {
                 // Right Now these values are giving the 2020 value only
                 return result;
         });
-        //console.log(countryData)
-        //console.log(world_json_data)
         var scaleOrdinal = d3.scaleOrdinal(d3.schemeCategory20c);
         var monochromaticColors = ['#46ff03','#3b9606','#186901'];
         var complementaryColors = ['#e9a3c9','#f7f7f7','#a1d76a'];
         // Brown and blue['#1e38ab','#030200','#a86420'];
         //Green and blue['#46ff03','#030200','#db7f15'];
         // Green and red [#5bad0e,'#030200',#a80e59];
+        
+        //Add the zoomed out map svg
         rawData = world_json_data;
         countries = topojson.feature(rawData, rawData.objects.countries);
         id_in_dict = function(val, arr){return Object.values(arr).reduce((a,x) => a || val == x.id, false)}
@@ -138,8 +138,29 @@ function done_function(error, csv_data, world_json_data, pop_area) {
                         return scaleOrdinal(ind+5 % 20);
                 });
         
+        svg.append("circle").attr("r", 124)
+                .style("fill", "none")
+                .style("stroke", "black")
+                .attr("cx", 247)
+                .attr("cy", 265);
+        //line on top side of circle
+         svg.append("line")
+                    .attr("x1", 247) 
+                    .attr("y1", 141) 
+                    .attr("x2", 500)
+                    .attr("y2", 0)
+                    .style("stroke", "black")
+                    .style("stroke-width", 1);
+        //line on left side of circle
+        svg.append("line")
+                    .attr("x1", 247) 
+                    .attr("y1", 389) 
+                    .attr("x2", 500)
+                    .attr("y2", 500)
+                    .style("stroke", "black")
+                    .style("stroke-width", 1);
+
         var paths = svg2.selectAll("path.country").data(countries.features);
-        
         paths.enter().append("path").attr("class", "country")
                 .merge(paths)
                 .attr("d", function(country){ 
