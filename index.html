@@ -195,7 +195,7 @@
 
                         if(d.NetMigration<1){
                             svgChart.append("text")
-                            .text(countryName)
+                            .text(country_id[d.Country].name)
                             .attr("x", xScale(i))
                             .attr("y", y2+10)
                             .attr("font-size", "10px")
@@ -206,7 +206,7 @@
                         }
                         else{
                             svgChart.append("text")
-                            .text(countryName)
+                            .text(country_id[d.Country].name)
                             .attr("x", xScale(i))
                             .attr("y", y2-5)
                             .attr("font-size", "10px")
