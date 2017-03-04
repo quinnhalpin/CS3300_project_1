@@ -30,7 +30,7 @@
         var pathGenerator3 = d3.geoPath().projection(projection3);
         var svg = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
         var svg2 = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
-        var svgChart = d3.select("#p2").append("svg").attr("width", 300).attr("height", 500);
+        var svgChart = d3.select("#p2").append("svg").attr("width", 700).attr("height", 400);
         var svg3 = d3.select("#p3").append("svg").attr("width", 500).attr("height", 500);
         var svg4 = d3.select("#p4").append("svg").attr("width", 1000).attr("height", 1000);
 
@@ -167,6 +167,49 @@
             
 
             //----------------Create Bar Chart of Net Migration----------------
+            //var migrationExtent = d3.extent(countryData,
+            //     function (d) { return d.NetMigration; });
+            var xScale = d3.scaleLinear().domain([0, 38]).range([20, 690]);
+            var migrationScale = d3.scaleLinear().domain([-385.6256,249.9996]).range([380, 20]);
+
+            countryData.forEach(function (d, i) {
+        //        if(d.Country in country_id){
+                    if (!isNaN(migrationScale(d.NetMigration))){
+                        y2 = migrationScale(d.NetMigration);
+                        svgChart.append("line")
+                        .attr("x1", xScale(i))
+                        .attr("y1", migrationScale(0))
+                        .attr("x2", xScale(i))
+                        .attr("y2", y2)
+                        .style("stroke", "black")
+                        .style("stroke-width", 15)
+                        .style("opacity", 0.75)
+
+                        if(d.NetMigration<1){
+                            svgChart.append("text")
+                            .text(d.Country)
+                            .attr("x", xScale(i))
+                            .attr("y", y2+10)
+                            .attr("font-size", "10px")
+                            .style("fill", "black")
+                            .attr("text-anchor", "middle")
+                            //.attr("alignment-baseline", "top")
+                            // .attr("transform", "rotate(90)")
+                        }
+                        else{
+                            svgChart.append("text")
+                            .text(d.Country)
+                            .attr("x", xScale(i))
+                            .attr("y", y2-5)
+                            .attr("font-size", "10px")
+                            .style("fill", "black")
+                            .attr("text-anchor", "middle")
+                        }
+                    }
+                    //dont plot the underfined
+                    else {}
+          //      }
+            });
 
 
             //----------------Create Plot of Country Area----------------
@@ -214,10 +257,10 @@
                             // [x,y] = [ - x_cent + xScaleCountry(id), - y_cent]
                             if (id_in_dict(country.id, small_country_arr)){
                                     [x_cent,y_cent] = projection3(d3.geoPath().centroid(country));
-                                    console.log(x_cent, y_cent)
+                                    //console.log(x_cent, y_cent)
                                     x = -x_cent*scale_country_id[country.id];
                                     y= -y_cent*scale_country_id[country.id];
-                                    console.log([x_cent,y_cent])
+                                    //console.log([x_cent,y_cent])
                                     size = popAreaData[id_to_ind.indexOf(country.id)].areaInSqKm;
                                     //console.log(size)
                                     // [x,y] = [xScaleCountry(id_to_ind.indexOf(country.id)%4),yScaleCountry(Math.floor((id_to_ind.indexOf(country.id))/4))]
