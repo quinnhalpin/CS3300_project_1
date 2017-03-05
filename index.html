@@ -145,6 +145,9 @@
           else if(d.INDICATOR == "SH_DYN_IMRT"){
             result.InfantMort = d.OBS_VALUE;
           }
+          else if (d.INDICATOR == "ID"){
+          	result.CountryId = d.OBS_VALUE;
+          }
         });
         // Right Now these values are giving the 2020 value only
         return result;
@@ -160,6 +163,10 @@
       // Brown and blue['#1e38ab','#030200','#a86420'];
       //Green and blue['#46ff03','#030200','#db7f15'];
       // Green and red [#5bad0e,'#030200',#a80e59];
+      var grayColors = ['#d3d3d3','#a9a9a9'];
+            // need to alter extents of population to scale
+      var colorScale = d3.scaleLinear().domain([-385.6256,0,249.9996]).range(complementaryColors); // MIgration scale
+      var grayScale = d3.scaleLinear().domain([0, 100]).range(grayColors);
             
       //----------------Add the zoomed out map svg----------------
       rawData = world_json_data;
@@ -178,8 +185,14 @@
       })
       .attr("id", function(country){return country.id;})
       .style("fill", function(country, ind) {
-        return scaleOrdinal(ind+5 % 20);
-      });
+                    	// This seems like an inefficient way of doing this..
+        	for (var i = 0; i <= countryData.length - 1; i++) {
+           	 	 if(countryData[i].CountryId == country.id){                            	return colorScale(countryData[i].NetMigration); 
+           	 	 }
+
+        	}
+        	return grayScale(ind+5 % 20);
+       });
       svg.append("circle").attr("r", 124)
         .style("fill", "none")
         .style("stroke", "black")
@@ -212,7 +225,11 @@
       })
       .attr("id", function(country){return country.id;})
       .style("fill", function(country, ind) {
-        return scaleOrdinal(ind+5 % 20);
+                    	// This seems like an inefficient way of doing this..
+         for (var i = 0; i <= countryData.length - 2; i++) {
+             if(countryData[i].CountryId == country.id){return colorScale(countryData[i].NetMigration);}
+          }
+      return grayScale(ind+5 % 20);
       });
     //----------------Create Bar Chart of Net Migration----------------
       //var migrationExtent = d3.extent(countryData,
