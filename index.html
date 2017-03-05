@@ -42,13 +42,12 @@
     var projection3 = d3.geoMercator().scale(300);
     var pathGenerator2 = d3.geoPath().projection(projection);
     var pathGenerator3 = d3.geoPath().projection(projection3);
-    var svg = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
-    var svg2 = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
+    var svgMap = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
+    var svgZoom = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
     var svg3 = d3.select("#p3").append("svg").attr("width", 500).attr("height", 500);
     var svg4 = d3.select("#p4").append("svg").attr("width", 500).attr("height", 500);
     var svgChart = d3.select("#p2").append("svg").attr("width", 700).attr("height", 400);
     var infantMort_netmigrate_svg = d3.select("#p5").append("svg").attr("width", 500).attr("height", 500);
-    /* This function returns an array countryData containing an object for each country with feilds for each variable (variable names are in lines 23,26,29,32,35,38)*/
 
     d3.queue()
     .defer(d3.csv, "large-tabular.csv")
@@ -136,6 +135,7 @@
 
     id_to_ind = [48,818,364,368,376,400,414,422,512,275,634,682,760,784,792,887];
     
+    /* This function returns an array countryData containing an object for each country with fields of the 2015 data for each variable*/
     function done_function(error, csv_data, world_json_data, pop_area) {
       dataset= csv_data;
       nestedData = d3.nest()
@@ -144,29 +144,30 @@
       countryData = nestedData.map(function(country){
         var result = {Country: country.key};
         country.values.forEach(function (d){
-          if (d.INDICATOR == "SM_POP_NETM") {
-            result.NetMigration = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SM_POP_NMRT"){
-            result.NetMigRate = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SP_POP_CHGE"){
-            result.PopChange = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SP_POP_TOTL"){
-            result.PopTotal = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SP_DYN_LE00"){
-            result.LifeExpect = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SH_DYN_IMRT"){
-            result.InfantMort = d.OBS_VALUE;
-          }
-          else if (d.INDICATOR == "ID"){
-          	result.CountryId = d.OBS_VALUE;
-          }
+        if(d.TIME_PERIOD =="2015"){
+            if (d.INDICATOR == "SM_POP_NETM") {
+                result.NetMigration = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SM_POP_NMRT"){
+                    result.NetMigRate = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SP_POP_CHGE"){
+                    result.PopChange = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SP_POP_TOTL"){
+                    result.PopTotal = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SP_DYN_LE00"){
+                    result.LifeExpect = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SH_DYN_IMRT"){
+                    result.InfantMort = d.OBS_VALUE;
+                }
+                else if (d.INDICATOR == "ID"){
+                    result.CountryId = d.OBS_VALUE;
+                }
+            }
         });
-        // Right Now these values are giving the 2020 value only
         return result;
       });
       //Remove the underfined element in the array
@@ -189,11 +190,11 @@
       rawData = world_json_data;
       countries = topojson.feature(rawData, rawData.objects.countries);
       id_in_dict = function(val, arr){return Object.values(arr).reduce((a,x) => a || val == x.id, false)}
-      projection_out.fitExtent([[-1500,-500], [3*svg.attr("width"), 3*svg.attr("height")]], countries);
-      projection.fitExtent([[-3582,-1500], [5.9*svg2.attr("width"), 5.9*svg2.attr("height")]], countries);
+      projection_out.fitExtent([[-1500,-500], [3*svgMap.attr("width"), 3*svgMap.attr("height")]], countries);
+      projection.fitExtent([[-3582,-1500], [5.9*svgZoom.attr("width"), 5.9*svgZoom.attr("height")]], countries);
       pathGenerator_out = d3.geoPath().projection(projection_out);
       pathGenerator2 = d3.geoPath().projection(projection);
-      var path_all = svg.selectAll("path.country").data(countries.features);
+      var path_all = svgMap.selectAll("path.country").data(countries.features);
       
       path_all.enter().append("path").attr("class", "country")
       .merge(path_all)
@@ -211,13 +212,13 @@
         	}
         	return grayScale(ind+5 % 20);
        });
-      svg.append("circle").attr("r", 124)
+      svgMap.append("circle").attr("r", 124)
         .style("fill", "none")
         .style("stroke", "black")
         .attr("cx", 247)
         .attr("cy", 265);
       //line on top side of circle
-      svg.append("line")
+      svgMap.append("line")
         .attr("x1", 247) 
         .attr("y1", 141) 
         .attr("x2", 500)
@@ -225,7 +226,7 @@
         .style("stroke", "black")
         .style("stroke-width", 1);
       //line on left side of circle
-      svg.append("line")
+      svgMap.append("line")
         .attr("x1", 247) 
         .attr("y1", 389) 
         .attr("x2", 500)
@@ -233,7 +234,7 @@
         .style("stroke", "black")
         .style("stroke-width", 1);
       //----------------Create the zoomed in map----------------
-      var paths = svg2.selectAll("path.country").data(countries.features);
+      var paths = svgZoom.selectAll("path.country").data(countries.features);
       paths.enter().append("path").attr("class", "country")
       .merge(paths)
       .attr("d", function(country){
@@ -252,8 +253,8 @@
     //----------------Create Bar Chart of Net Migration----------------
       //var migrationExtent = d3.extent(countryData,
       //     function (d) { return d.NetMigration; });
-      var xScale = d3.scaleLinear().domain([0, 15]).range([20, 680]);
-      var migrationScale = d3.scaleLinear().domain([-53.1362,249.9996]).range([340, 20]);
+      var xScale = d3.scaleLinear().domain([0, 15]).range([40, 655]);
+      var migrationScale = d3.scaleLinear().domain([-80.0004,249.9996]).range([340, 20]);
 
       //Sort the countryData by the net migration
       countryData.sort(function (a,b) {
@@ -264,6 +265,7 @@
       countryData.forEach(function (d) {
         if(d.Country in country_id){
           y2 = migrationScale(d.NetMigration);
+          console.log(d.NetMigration)
           svgChart.append("line")
           .attr("x1", xScale(i))
           .attr("y1", migrationScale(0))
