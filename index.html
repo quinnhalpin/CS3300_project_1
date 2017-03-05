@@ -42,13 +42,12 @@
     var projection3 = d3.geoMercator().scale(300);
     var pathGenerator2 = d3.geoPath().projection(projection);
     var pathGenerator3 = d3.geoPath().projection(projection3);
-    var svg = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
-    var svg2 = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
+    var svgMap = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
+    var svgZoom = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
     var svg3 = d3.select("#p3").append("svg").attr("width", 500).attr("height", 500);
     var svg4 = d3.select("#p4").append("svg").attr("width", 500).attr("height", 500);
     var svgChart = d3.select("#p2").append("svg").attr("width", 700).attr("height", 400);
     var infantMort_netmigrate_svg = d3.select("#p5").append("svg").attr("width", 500).attr("height", 500);
-    /* This function returns an array countryData containing an object for each country with feilds for each variable (variable names are in lines 23,26,29,32,35,38)*/
 
     d3.queue()
     .defer(d3.csv, "large-tabular.csv")
@@ -102,11 +101,28 @@
       "QAT": {"name":"Qatar", "ind":10, "id": 634}, 
       "SAU": {"name":"Saudi Arabia", "ind":11, "id": 682}, 
       "SYR": {"name":"Syria", "ind":12, "id": 760}, 
-      "TUR":{"name":"Turkey", "ind":13, "id": 792}, 
       "ARE": {"name":"United Arab Emirates", "ind": 14, "id": 784}, 
+      "TUR":{"name":"Turkey", "ind":13, "id": 792}, 
       "YEM": {"name":"Yemen", "ind":15, "id": 887}      
     }
-
+    id_to_acry = {
+      "48": "BHR",
+      "818" : "EGY",
+      "364" : "IRN",
+      "368" : "IRQ",
+      "376" : "ISR",
+      "400" : "JOR",
+      "414" : "KWT",
+      "422" : "LBN",
+      "512" : "OMN",
+      "275" : "PSE",
+      "634": "QAT", 
+      "682" : "SAU", 
+      "760": "SYR", 
+      "784" : "ARE",
+      "792" : "TUR",
+      "887": "YEM", 
+    }
     id_to_country = {
       "48": "Bahrain",
       "818" : "Egypt",
@@ -121,13 +137,14 @@
       "634": "Qatar", 
       "682" : "Saudi Arabia", 
       "760": "Syria", 
-      "792" : "Turkey",
       "784" : "United Arab Emirates",
+      "792" : "Turkey",
       "887": "Yemen", 
     }
 
-    id_to_ind = [48,818,364,368,376,400,414,422,512,275,634,682,760,792,784,887];
+    id_to_ind = [48,818,364,368,376,400,414,422,512,275,634,682,760,784,792,887];
     
+    /* This function returns an array countryData containing an object for each country with fields of the 2015 data for each variable*/
     function done_function(error, csv_data, world_json_data, pop_area) {
       dataset= csv_data;
       nestedData = d3.nest()
@@ -136,29 +153,30 @@
       countryData = nestedData.map(function(country){
         var result = {Country: country.key};
         country.values.forEach(function (d){
-          if (d.INDICATOR == "SM_POP_NETM") {
-            result.NetMigration = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SM_POP_NMRT"){
-            result.NetMigRate = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SP_POP_CHGE"){
-            result.PopChange = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SP_POP_TOTL"){
-            result.PopTotal = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SP_DYN_LE00"){
-            result.LifeExpect = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SH_DYN_IMRT"){
-            result.InfantMort = d.OBS_VALUE;
-          }
-          else if (d.INDICATOR == "ID"){
-          	result.CountryId = d.OBS_VALUE;
-          }
+        if(d.TIME_PERIOD =="2015"){
+            if (d.INDICATOR == "SM_POP_NETM") {
+                result.NetMigration = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SM_POP_NMRT"){
+                    result.NetMigRate = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SP_POP_CHGE"){
+                    result.PopChange = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SP_POP_TOTL"){
+                    result.PopTotal = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SP_DYN_LE00"){
+                    result.LifeExpect = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SH_DYN_IMRT"){
+                    result.InfantMort = d.OBS_VALUE;
+                }
+                else if (d.INDICATOR == "ID"){
+                    result.CountryId = d.OBS_VALUE;
+                }
+            }
         });
-        // Right Now these values are giving the 2020 value only
         return result;
       });
       //Remove the underfined element in the array
@@ -182,11 +200,11 @@
       rawData = world_json_data;
       countries = topojson.feature(rawData, rawData.objects.countries);
       id_in_dict = function(val, arr){return Object.values(arr).reduce((a,x) => a || val == x.id, false)}
-      projection_out.fitExtent([[-1500,-500], [3*svg.attr("width"), 3*svg.attr("height")]], countries);
-      projection.fitExtent([[-3582,-1500], [5.9*svg2.attr("width"), 5.9*svg2.attr("height")]], countries);
+      projection_out.fitExtent([[-1500,-500], [3*svgMap.attr("width"), 3*svgMap.attr("height")]], countries);
+      projection.fitExtent([[-3582,-1500], [5.9*svgZoom.attr("width"), 5.9*svgZoom.attr("height")]], countries);
       pathGenerator_out = d3.geoPath().projection(projection_out);
       pathGenerator2 = d3.geoPath().projection(projection);
-      var path_all = svg.selectAll("path.country").data(countries.features);
+      var path_all = svgMap.selectAll("path.country").data(countries.features);
       
       path_all.enter().append("path").attr("class", "country")
       .merge(path_all)
@@ -203,21 +221,17 @@
                     	// This seems like an inefficient way of doing this..
         	for (var i = 0; i <= countryData.length - 1; i++) {
            	 	 if(countryData[i].CountryId == country.id ){
-                    console.log(countryData[i].Country);
-                    console.log(countryData[i].NetMigration);
-                   	return colorScaleBig(countryData[i].NetMigration); 
+                   	return colorScaleBig(countryData[i].NetMigration); }
            	 	 }
-
-        	}
         	return grayScale(ind+5 % 20);
        });
-      svg.append("circle").attr("r", 124)
+      svgMap.append("circle").attr("r", 124)
         .style("fill", "none")
         .style("stroke", "black")
         .attr("cx", 247)
         .attr("cy", 265);
       //line on top side of circle
-      svg.append("line")
+      svgMap.append("line")
         .attr("x1", 247) 
         .attr("y1", 141) 
         .attr("x2", 500)
@@ -225,7 +239,7 @@
         .style("stroke", "black")
         .style("stroke-width", 1);
       //line on left side of circle
-      svg.append("line")
+      svgMap.append("line")
         .attr("x1", 247) 
         .attr("y1", 389) 
         .attr("x2", 500)
@@ -233,7 +247,7 @@
         .style("stroke", "black")
         .style("stroke-width", 1);
       //----------------Create the zoomed in map----------------
-      var paths = svg2.selectAll("path.country").data(countries.features);
+      var paths = svgZoom.selectAll("path.country").data(countries.features);
       paths.enter().append("path").attr("class", "country")
       .merge(paths)
       .attr("d", function(country){
@@ -252,8 +266,8 @@
     //----------------Create Bar Chart of Net Migration----------------
       //var migrationExtent = d3.extent(countryData,
       //     function (d) { return d.NetMigration; });
-      var xScale = d3.scaleLinear().domain([0, 15]).range([20, 680]);
-      var migrationScale = d3.scaleLinear().domain([-53.1362,249.9996]).range([340, 20]);
+      var xScale = d3.scaleLinear().domain([0, 15]).range([40, 655]);
+      var migrationScale = d3.scaleLinear().domain([-80.0004,249.9996]).range([340, 20]);
 
       //Sort the countryData by the net migration
       countryData.sort(function (a,b) {
@@ -264,6 +278,7 @@
       countryData.forEach(function (d) {
         if(d.Country in country_id){
           y2 = migrationScale(d.NetMigration);
+          console.log(d.NetMigration)
           svgChart.append("line")
           .attr("x1", xScale(i))
           .attr("y1", migrationScale(0))
@@ -370,8 +385,96 @@
         .text(function(country){
           return id_to_country['' + country.id];
         });
-      // -----------------------Add Scatter Plot-----------------------
-     }
+      // ---------Infant Mortality vs Migration Rate Scatter Plot---------------
+      // set up scales
+      var xScale_infant_migrate = d3.scaleLinear().domain([1, 60]).range([10, 450]);
+      var yScale_infant_migrate = d3.scaleLinear().domain([-5, 9]).range([450, 10]); 
+      var botAxis_infant_mitrate = d3.axisBottom(xScale_infant_migrate).ticks(10).tickSize(9);
+      var leftAxis_infant_mitrate = d3.axisLeft(yScale_infant_migrate).ticks(10).tickSize(9);
+      var inf_mitrate_plot = infantMort_netmigrate_svg.append("g");
+      
+      // set up country icons
+      var country_group_inf_mitrate = infantMort_netmigrate_svg.selectAll('g')
+      .data(mideast)
+      .enter()
+      .append('g')
+      // draw countries
+      function find_country_index(id){
+        notFound = true;
+        i = 0;
+        str_id = '' + id;
+        while (i < countryData.length & notFound){
+          if (countryData[i].CountryId == str_id){
+            notFound = false;
+            return i;
+          }
+          i += 1;
+        }
+      }
+      // can't get united arab emirates to show up for some reason
+      country_group_inf_mitrate
+        .append('path')
+        .attr('d', function(country){
+          console.log(country.id)
+          if (Object.keys(id_to_country).includes('' + country.id)){
+            console.log(country.id)
+            return pathGenerator2(country);
+          }})
+        .style("fill", function(country, ind) {
+          return scaleOrdinal(ind % 20);
+        })
+        .attr("transform", function(country, id) {
+          if (Object.keys(id_to_country).includes('' + country.id)){
+            [x_cent,y_cent] = projection(d3.geoPath().centroid(country));
+            top_left_x = -x_cent*scale_country_id[country.id];
+            top_left_y= -y_cent*scale_country_id[country.id];
+            country_short = id_to_acry[country.id]
+            country_index = find_country_index(country.id)
+            console.log(countryData[country_index] )
+
+            if (countryData[country_index] != undefined){
+              infant_x = xScale_infant_migrate(Number(countryData[country_index].InfantMort))
+              migrate_y = yScale_infant_migrate(Number(countryData[country_index].NetMigRate))
+            }
+            else{
+              infant_x = 0;
+              migrate_y = 0;
+            }
+            return "translate("+ top_left_x +","+ top_left_y +")translate("+
+            infant_x+","+migrate_y+")  scale(" + scale_country_id[country.id]+ ") ";
+          }
+        });
+      // add country name
+      country_group_inf_mitrate
+        .append('text')
+        .style("font-size", "10pt")
+        .attr("transform", function(country,ind) {
+          if (Object.keys(id_to_country).includes('' + country.id)){
+            country_index = find_country_index(country.id)
+            if (countryData[country_index] != undefined){
+              infant_x_text = xScale_infant_migrate(Number(countryData[country_index].InfantMort)) - 12;
+              migrate_y_text = yScale_infant_migrate(Number(countryData[country_index].NetMigRate));
+            }
+            else{
+              infant_x_text = 0;
+              migrate_y_text = 0;
+            }
+            return "translate("+infant_x_text+","+migrate_y_text+")";
+          }})
+        .text(function(country){
+          return id_to_country['' + country.id];
+        });
+
+      // add axeses
+      inf_mitrate_plot.append("g").style("font", "10px times")
+        .call(botAxis_infant_mitrate).attr("transform","translate(10,293)");
+      inf_mitrate_plot.append("g").style("font", "10px times")
+        .call(leftAxis_infant_mitrate).attr("transform","translate(20,0)");
+
+
+
+    }
+
 
 	 </script>
 </body>
