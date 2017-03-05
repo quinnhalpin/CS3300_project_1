@@ -4,26 +4,6 @@
         //Green and blue['#46ff03','#030200','#db7f15'];
         // Green and red [#5bad0e,'#030200',#a80e59];
 
-        var grayColors = ['#d3d3d3','#a9a9a9'];
-            // need to alter extents of population to scale
-            var colorScale = d3.scaleLinear().domain([-385.6256,0,249.9996]).range(complementaryColors); // MIgration scale
-            var grayScale = d3.scaleLinear().domain([0, 100]).range(grayColors);
-
-
-
-THE COLOR function... 
-.style("fill", function(country, ind) {
-                        console.log("hello");
-                    	// This seems like an inefficient way of doing this..
-                        for (var i = 0; i <= countryData.length - 2; i++) {
-                            console.log("bye");
-                            if(countryData[i].CountryId == country.id){return colorScale(countryData[i].NetMigration);}
-                        }
-                        return grayScale(ind+5 % 20);
-                    });
-
-
-
 
 
 Iran, Iraq, Libya, Somalia, Sudan, Syria, and Yemen
@@ -32,10 +12,9 @@ Iran, Iraq, Libya, Somalia, Sudan, Syria, and Yemen
             "IRQ": {"ind":3, "id": 368},
             "SYR": {"ind":12, "id": 760},  
             "YEM": {"ind":15, "id": 887},
-            "LBY": {"ind":16 "id":434},
-            "SDN": {"ind":17 "id":736},
-            "SOM": {"ind":18 "id":706}
-
+            "LBY": {"ind":16, "id":434},
+            "SDN": {"ind":17, "id":736},
+            "SOM": {"ind":18, "id":706}
         }
 
 Somalia's Data:
@@ -71,45 +50,3 @@ Somalia's Data:
 "SP_DYN_LE00";"A";"Y0";"_T";"_T";"SOM";"M";"2015";"56.533"
 "SP_DYN_LE00";"A";"Y0";"_T";"_T";"SOM";"M";"2020";"58.134"
 "ID";"A";"Y0";"_T";"_T";"SOM";"M";"2015";"706"
-
- Complete IDS
-"ID";"A";"Y0";"_T";"_T";"AFG";"M";"2015";"004"
-"ID";"A";"Y0";"_T";"_T";"CYP";"M";"2015";"357"
-"ID";"A";"Y0";"_T";"_T";"AZE";"M";"2015";"031"
-"ID";"A";"Y0";"_T";"_T";"DJI";"M";"2015";"262"
-"ID";"A";"Y0";"_T";"_T";"ERI";"M";"2015";"232"
-"ID";"A";"Y0";"_T";"_T";"ETH";"M";"2015";"231"
-"ID";"A";"Y0";"_T";"_T";"GEO";"M";"2015";"268"
-"ID";"A";"Y0";"_T";"_T";"GRC";"M";"2015";"300"
-"ID";"A";"Y0";"_T";"_T";"IND";"M";"2015";"356"
-"ID";"A";"Y0";"_T";"_T";"ITA";"M";"2015";"380"
-"ID";"A";"Y0";"_T";"_T";"NER";"M";"2015";"562"
-"ID";"A";"Y0";"_T";"_T";"YEM";"M";"2015";"887"
-"ID";"A";"Y0";"_T";"_T";"BHR";"M";"2015";"048"
-"ID";"A";"Y0";"_T";"_T";"EGY";"M";"2015";"818"
-"ID";"A";"Y0";"_T";"_T";"IRN";"M";"2015";"364"
-"ID";"A";"Y0";"_T";"_T";"IRQ";"M";"2015";"368"
-"ID";"A";"Y0";"_T";"_T";"ISR";"M";"2015";"376"
-"ID";"A";"Y0";"_T";"_T";"JOR";"M";"2015";"400"
-"ID";"A";"Y0";"_T";"_T";"KWT";"M";"2015";"414"
-"ID";"A";"Y0";"_T";"_T";"LBN";"M";"2015";"422"
-"ID";"A";"Y0";"_T";"_T";"OMN";"M";"2015";"512"
-"ID";"A";"Y0";"_T";"_T";"PSE";"M";"2015";"275"
-"ID";"A";"Y0";"_T";"_T";"QAT";"M";"2015";"634"
-"ID";"A";"Y0";"_T";"_T";"SAU";"M";"2015";"682"
-"ID";"A";"Y0";"_T";"_T";"SYR";"M";"2015";"760"
-"ID";"A";"Y0";"_T";"_T";"TUR";"M";"2015";"792"
-"ID";"A";"Y0";"_T";"_T";"ARE";"M";"2015";"784"
-"ID";"A";"Y0";"_T";"_T";"UZB";"M";"2015";"860"
-"ID";"A";"Y0";"_T";"_T";"TKM";"M";"2015";"795"
-"ID";"A";"Y0";"_T";"_T";"TCD";"M";"2015";"788"
-"ID";"A";"Y0";"_T";"_T";"TJK";"M";"2015";"762"
-"ID";"A";"Y0";"_T";"_T";"SYR";"M";"2015";"760"
-"ID";"A";"Y0";"_T";"_T";"RUS";"M";"2015";"643"
-"ID";"A";"Y0";"_T";"_T";"SDN";"M";"2015";"736"
-"ID";"A";"Y0";"_T";"_T";"SSD";"M";"2015";"728"
-"ID";"A";"Y0";"_T";"_T";"PAK";"M";"2015";"586"
-"ID";"A";"Y0";"_T";"_T";"KGZ";"M";"2015";"417"
-"ID";"A";"Y0";"_T";"_T";"LBN";"M";"2015";"422"
-"ID";"A";"Y0";"_T";"_T";"LBY";"M";"2015";"434"
-"ID";"A";"Y0";"_T";"_T";"KAZ";"M";"2015";"398"
