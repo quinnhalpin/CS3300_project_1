@@ -72,6 +72,24 @@
       784: 1,
       887: .5
     }
+    small_scale_country_id = {
+      48: 7,
+      818: .2,
+      364: .15,
+      368: .25,
+      376: .8,
+      400: .6,
+      414: 1.3,
+      422: 1.5,
+      512: .4,
+      275: 2,
+      634: 2,
+      682: .15,
+      760: .4,
+      784: .6,
+      792: .25,
+      887: .4
+    }
     small_country_arr = {
       "Yemen": {"ind":15, "id": 887}, 
       "Egypt": {"ind":1, "id": 818}, 
@@ -354,10 +372,10 @@
         .attr("transform", function(country, id) {
 	        if (Object.keys(id_to_country).includes('' + country.id)){
             [x_cent,y_cent] = projection(d3.geoPath().centroid(country));
-	          x = -x_cent*scale_country_id[country.id];
-	          y= -y_cent*scale_country_id[country.id];
+	          x = -x_cent*small_scale_country_id[country.id];
+	          y= -y_cent*small_scale_country_id[country.id];
 	          size = popAreaData[id_to_ind.indexOf(country.id)].areaInSqKm;
-	          return "translate("+ x +","+ y +")translate("+xScaleLarge(id%4)+","+yScaleLarge(Math.floor(id/4))+")  scale(" + scale_country_id[country.id]+ ") ";
+	          return "translate("+ x +","+ y +")translate("+xScaleLarge(id%4)+","+yScaleLarge(Math.floor(id/4))+")  scale(" + small_scale_country_id[country.id]+ ") ";
 	        }
 	      });
       groups
@@ -375,7 +393,7 @@
       // ---------Infant Mortality vs Migration Rate Scatter Plot---------------
       // set up scales
       var xScale_infant_migrate = d3.scaleLinear().domain([1, 60]).range([10, 450]);
-      var yScale_infant_migrate = d3.scaleLinear().domain([-5, 9]).range([450, 10]); 
+      var yScale_infant_migrate = d3.scaleLinear().domain([-5, 12]).range([450, 10]); 
       var botAxis_infant_mitrate = d3.axisBottom(xScale_infant_migrate).ticks(10).tickSize(9);
       var leftAxis_infant_mitrate = d3.axisLeft(yScale_infant_migrate).ticks(10).tickSize(9);
       var inf_mitrate_plot = infantMort_netmigrate_svg.append("g");
@@ -390,6 +408,9 @@
         notFound = true;
         i = 0;
         str_id = '' + id;
+        if (str_id.length == 2){
+          str_id = "0" + str_id;
+        }
         while (i < countryData.length & notFound){
           if (countryData[i].CountryId == str_id){
             notFound = false;
@@ -397,6 +418,8 @@
           }
           i += 1;
         }
+        console.log("find_country couldn't find")
+        console.log(id)
       }
       // can't get united arab emirates to show up for some reason
       country_group_inf_mitrate
@@ -413,8 +436,8 @@
         .attr("transform", function(country, id) {
           if (Object.keys(id_to_country).includes('' + country.id)){
             [x_cent,y_cent] = projection(d3.geoPath().centroid(country));
-            top_left_x = -x_cent*scale_country_id[country.id];
-            top_left_y= -y_cent*scale_country_id[country.id];
+            top_left_x = -x_cent*small_scale_country_id[country.id];
+            top_left_y= -y_cent*small_scale_country_id[country.id];
             country_short = id_to_acry[country.id]
             country_index = find_country_index(country.id)
             console.log(countryData[country_index] )
@@ -424,11 +447,13 @@
               migrate_y = yScale_infant_migrate(Number(countryData[country_index].NetMigRate))
             }
             else{
+              console.log("cannot find")
+              console.log(country_index)
               infant_x = 0;
               migrate_y = 0;
             }
             return "translate("+ top_left_x +","+ top_left_y +")translate("+
-            infant_x+","+migrate_y+")  scale(" + scale_country_id[country.id]+ ") ";
+            infant_x+","+migrate_y+")  scale(" + small_scale_country_id[country.id]+ ") ";
           }
         });
       // add country name
@@ -440,6 +465,10 @@
             country_index = find_country_index(country.id)
             if (countryData[country_index] != undefined){
               infant_x_text = xScale_infant_migrate(Number(countryData[country_index].InfantMort)) - 12;
+              if (countryData[country_index].CountryId == "422"){
+                console.log("Lebanon")
+                console.log(country_index)
+              }
               migrate_y_text = yScale_infant_migrate(Number(countryData[country_index].NetMigRate));
             }
             else{
