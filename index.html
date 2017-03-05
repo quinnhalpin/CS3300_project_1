@@ -101,6 +101,12 @@
                     });
                     return result;
             });
+            
+            //Remove the underfined element in the array
+            countryData = countryData.filter(function(c) {
+                return c.Country !== "undefined";
+            }); 
+
             var scaleOrdinal = d3.scaleOrdinal(d3.schemeCategory20c);
             var monochromaticColors = ['#46ff03','#3b9606','#186901'];
             var complementaryColors = ['#e9a3c9','#f7f7f7','#a1d76a'];
@@ -169,52 +175,47 @@
             //----------------Create Bar Chart of Net Migration----------------
             //var migrationExtent = d3.extent(countryData,
             //     function (d) { return d.NetMigration; });
-            var xScale = d3.scaleLinear().domain([0, 16]).range([20, 690]);
+            var xScale = d3.scaleLinear().domain([0, 15]).range([20, 680]);
             var migrationScale = d3.scaleLinear().domain([-53.1362,249.9996]).range([340, 20]);
 
-           countryData = countryData.sort(function (a, b){
-                console.log(a.NetMigration)
-                return a.NetMigration  - b.NetMigration;
+            //Sort the countryData by the net migration
+            countryData.sort(function (a,b) {
+                return parseFloat(a.NetMigration) - parseFloat(b.NetMigration);
             });
 
             i=0;
             countryData.forEach(function (d) {
                 if(d.Country in country_id){
-                    console.log(d.NetMigration)
-                    if (d.NetMigration != 'underfined'){
-                        y2 = migrationScale(d.NetMigration);
-                        svgChart.append("line")
-                        .attr("x1", xScale(i))
-                        .attr("y1", migrationScale(0))
-                        .attr("x2", xScale(i))
-                        .attr("y2", y2)
-                        .style("stroke", "black")
-                        .style("stroke-width", 20)
-                        .style("opacity", 0.75)
+                    y2 = migrationScale(d.NetMigration);
+                    svgChart.append("line")
+                    .attr("x1", xScale(i))
+                    .attr("y1", migrationScale(0))
+                    .attr("x2", xScale(i))
+                    .attr("y2", y2)
+                    .style("stroke", "black")
+                    .style("stroke-width", 20)
+                    .style("opacity", 0.75)
 
-                        if(d.NetMigration<1){
-                            svgChart.append("text")
-                            .text(country_id[d.Country].name)
-                            .attr("x", xScale(i))
-                            .attr("y", y2+10)
-                            .attr("font-size", "10px")
-                            .style("fill", "black")
-                            .attr("text-anchor", "middle")
-                            //.attr("alignment-baseline", "top")
-                            // .attr("transform", "rotate(90)")
-                        }
-                        else{
-                            svgChart.append("text")
-                            .text(country_id[d.Country].name)
-                            .attr("x", xScale(i))
-                            .attr("y", y2-5)
-                            .attr("font-size", "10px")
-                            .style("fill", "black")
-                            .attr("text-anchor", "middle")
-                        }
+                    if(d.NetMigration<1){
+                        svgChart.append("text")
+                        .text(country_id[d.Country].name)
+                        .attr("x", xScale(i))
+                        .attr("y", y2+10)
+                        .attr("font-size", "10px")
+                        .style("fill", "black")
+                        .attr("text-anchor", "middle")
+                        //.attr("alignment-baseline", "top")
+                        // .attr("transform", "rotate(90)")
                     }
-                    //dont plot the underfined
-                    else {}
+                    else{
+                        svgChart.append("text")
+                        .text(country_id[d.Country].name)
+                        .attr("x", xScale(i))
+                        .attr("y", y2-5)
+                        .attr("font-size", "10px")
+                        .style("fill", "black")
+                        .attr("text-anchor", "middle")
+                    }
                     i+=1;
                 }
             });
