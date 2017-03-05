@@ -48,7 +48,6 @@
     var svg4 = d3.select("#p4").append("svg").attr("width", 500).attr("height", 500);
     var svgChart = d3.select("#p2").append("svg").attr("width", 700).attr("height", 400);
     var infantMort_netmigrate_svg = d3.select("#p5").append("svg").attr("width", 500).attr("height", 500);
-    /* This function returns an array countryData containing an object for each country with feilds for each variable (variable names are in lines 23,26,29,32,35,38)*/
 
     d3.queue()
     .defer(d3.csv, "large-tabular.csv")
@@ -119,6 +118,7 @@
 
     id_to_ind = [48,818,364,368,376,400,414,422,512,275,634,682,760,792,784,887];
     
+    /* This function returns an array countryData containing an object for each country with fields of the 2015 data for each variable*/
     function done_function(error, csv_data, world_json_data, pop_area) {
       dataset= csv_data;
       nestedData = d3.nest()
@@ -127,29 +127,30 @@
       countryData = nestedData.map(function(country){
         var result = {Country: country.key};
         country.values.forEach(function (d){
-          if (d.INDICATOR == "SM_POP_NETM") {
-            result.NetMigration = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SM_POP_NMRT"){
-            result.NetMigRate = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SP_POP_CHGE"){
-            result.PopChange = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SP_POP_TOTL"){
-            result.PopTotal = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SP_DYN_LE00"){
-            result.LifeExpect = d.OBS_VALUE;
-          }
-          else if(d.INDICATOR == "SH_DYN_IMRT"){
-            result.InfantMort = d.OBS_VALUE;
-          }
-          else if (d.INDICATOR == "ID"){
-          	result.CountryId = d.OBS_VALUE;
-          }
+        if(d.TIME_PERIOD =="2015"){
+            if (d.INDICATOR == "SM_POP_NETM") {
+                result.NetMigration = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SM_POP_NMRT"){
+                    result.NetMigRate = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SP_POP_CHGE"){
+                    result.PopChange = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SP_POP_TOTL"){
+                    result.PopTotal = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SP_DYN_LE00"){
+                    result.LifeExpect = d.OBS_VALUE;
+                }
+                else if(d.INDICATOR == "SH_DYN_IMRT"){
+                    result.InfantMort = d.OBS_VALUE;
+                }
+                else if (d.INDICATOR == "ID"){
+                    result.CountryId = d.OBS_VALUE;
+                }
+            }
         });
-        // Right Now these values are giving the 2020 value only
         return result;
       });
       //Remove the underfined element in the array
@@ -235,7 +236,7 @@
       //var migrationExtent = d3.extent(countryData,
       //     function (d) { return d.NetMigration; });
       var xScale = d3.scaleLinear().domain([0, 15]).range([40, 655]);
-      var migrationScale = d3.scaleLinear().domain([-53.1362,96.9046]).range([340, 20]);
+      var migrationScale = d3.scaleLinear().domain([-80.0004,249.9996]).range([340, 20]);
 
       //Sort the countryData by the net migration
       countryData.sort(function (a,b) {
