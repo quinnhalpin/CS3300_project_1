@@ -234,8 +234,8 @@
     //----------------Create Bar Chart of Net Migration----------------
       //var migrationExtent = d3.extent(countryData,
       //     function (d) { return d.NetMigration; });
-      var xScale = d3.scaleLinear().domain([0, 15]).range([20, 680]);
-      var migrationScale = d3.scaleLinear().domain([-53.1362,249.9996]).range([340, 20]);
+      var xScale = d3.scaleLinear().domain([0, 15]).range([40, 655]);
+      var migrationScale = d3.scaleLinear().domain([-53.1362,96.9046]).range([340, 20]);
 
       //Sort the countryData by the net migration
       countryData.sort(function (a,b) {
@@ -246,6 +246,7 @@
       countryData.forEach(function (d) {
         if(d.Country in country_id){
           y2 = migrationScale(d.NetMigration);
+          console.log(d.NetMigration)
           svgChart.append("line")
           .attr("x1", xScale(i))
           .attr("y1", migrationScale(0))
