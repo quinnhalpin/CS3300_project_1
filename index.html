@@ -32,7 +32,7 @@
 	</div>
   <div id = "p5">
     <p>
-      Infant Mortality vs Net Migration Rate
+      Infant Mortality vs Net Migration Rate of Middle Eastern Countries and India in 2015
     </p>
   </div>
 	<script type="text/javascript">
@@ -47,7 +47,7 @@
     var svg3 = d3.select("#p3").append("svg").attr("width", 500).attr("height", 500);
     var svg4 = d3.select("#p4").append("svg").attr("width", 500).attr("height", 500);
     var svgChart = d3.select("#p2").append("svg").attr("width", 700).attr("height", 400);
-    var infantMort_netmigrate_svg = d3.select("#p5").append("svg").attr("width", 500).attr("height", 500);
+    var infantMort_netmigrate_svg = d3.select("#p5").append("svg").attr("width", 600).attr("height", 600);
 
     d3.queue()
     .defer(d3.csv, "large-tabular.csv")
@@ -88,7 +88,8 @@
       760: .4,
       784: .6,
       792: .25,
-      887: .4
+      887: .4,
+      356: .15
     }
     small_country_arr = {
       "Yemen": {"ind":15, "id": 887}, 
@@ -142,6 +143,7 @@
       "887": "YEM", 
     }
     id_to_country = {
+      "356": "India",
       "48": "Bahrain",
       "818" : "Egypt",
       "364" : "Iran",
@@ -160,8 +162,10 @@
       "887": "Yemen", 
     }
 
-    id_to_ind = [48,818,364,368,376,400,414,422,512,275,634,682,760,784,792,887];
+    middle_east_ids = [48,818,364,368,376,400,414,422,512,275,634,682,760,784,792,887];
+    middle_east_plus_india_ids = [356,48,818,364,368,376,400,414,422,512,275,634,682,760,784,792,887];
     
+
     /* This function returns an array countryData containing an object for each country with fields of the 2015 data for each variable*/
     function done_function(error, csv_data, world_json_data, pop_area) {
       dataset= csv_data;
@@ -361,21 +365,25 @@
       pathGenerator3 = d3.geoPath().projection(projection3);
       var paths_special = svg4.selectAll("path.country").data(countries.features);
       country_for_id = function(val, arr){return Object.values(arr).reduce((a,x) => a.id || Object.key , false)}
-      var xScaleCountry = d3.scaleLinear().domain([0,3]).range([100,900]);
-      var yScaleCountry = d3.scaleLinear().domain([0,3]).range([100,900]);
+      var xScaleCountry = d3.scaleLinear().domain([0,4]).range([100,400]);
+      var yScaleCountry = d3.scaleLinear().domain([0,4]).range([100,400]);
       var placeScale = d3.scaleLinear().domain([0,1000]).range([0,143])
-      var xScaleLarge = d3.scaleLinear().domain([0,3]).range([50, 450]);
-      var yScaleLarge = d3.scaleLinear().domain([0,3]).range([50, 450]);
+      var xScaleLarge = d3.scaleLinear().domain([0,4]).range([50, 450]);
+      var yScaleLarge = d3.scaleLinear().domain([0,4]).range([50, 450]);
       i = 0;
-      var mideast = countries.features.filter((a) => id_to_ind.includes(a.id));
+      var middle_east_plus_india = countries.features.filter((a) => middle_east_plus_india_ids.includes(a.id));
+      var mideast = countries.features.filter((a) => middle_east_ids.includes(a.id));
       var groups = svg4.selectAll('g')
-      .data(mideast)
+      .data(middle_east_plus_india)
       .enter()
       .append('g')
 
       groups
         .append('path')
         .attr('d', function(country){
+          if (country.id == 784){
+            console.log("found country")
+          } 
           if (Object.keys(id_to_country).includes('' + country.id)){
             return pathGenerator2(country);
           }})
@@ -387,8 +395,7 @@
             [x_cent,y_cent] = projection(d3.geoPath().centroid(country));
 	          x = -x_cent*small_scale_country_id[country.id];
 	          y= -y_cent*small_scale_country_id[country.id];
-	          size = popAreaData[id_to_ind.indexOf(country.id)].areaInSqKm;
-	          return "translate("+ x +","+ y +")translate("+xScaleLarge(id%4)+","+yScaleLarge(Math.floor(id/4))+")  scale(" + small_scale_country_id[country.id]+ ") ";
+	          return "translate("+ x +","+ y +")translate("+xScaleLarge(id%5)+","+yScaleLarge(Math.floor(id/5))+")  scale(" + small_scale_country_id[country.id]+ ") ";
 	        }
 	      });
       groups
@@ -396,8 +403,8 @@
         .style("font-size", "10pt")
         .attr("transform", function(country,id) {
           if (Object.keys(id_to_country).includes('' + country.id)){
-            x = xScaleLarge(id%4) - 13;
-            y = yScaleLarge(Math.floor(id/4));
+            x = xScaleLarge(id%5) - 13;
+            y = yScaleLarge(Math.floor(id/5));
             return "translate("+x+","+y+")";
           }})
         .text(function(country){
@@ -405,15 +412,14 @@
         });
       // ---------Infant Mortality vs Migration Rate Scatter Plot---------------
       // set up scales
-      var xScale_infant_migrate = d3.scaleLinear().domain([1, 60]).range([10, 450]);
-      var yScale_infant_migrate = d3.scaleLinear().domain([-5, 12]).range([450, 10]); 
-      var botAxis_infant_mitrate = d3.axisBottom(xScale_infant_migrate).ticks(10).tickSize(9);
-      var leftAxis_infant_mitrate = d3.axisLeft(yScale_infant_migrate).ticks(10).tickSize(9);
-      var inf_mitrate_plot = infantMort_netmigrate_svg.append("g");
+      var xScale_infant_migrate = d3.scaleLinear().domain([0, 60]).range([15, 550]);
+      var yScale_infant_migrate = d3.scaleLinear().domain([-16, 12]).range([550, 15]); 
+      var botAxis_infant_mitrate = d3.axisBottom(xScale_infant_migrate).ticks(5).tickSize(9);
+      var leftAxis_infant_mitrate = d3.axisLeft(yScale_infant_migrate).ticks(5).tickSize(9);
       
       // set up country icons
       var country_group_inf_mitrate = infantMort_netmigrate_svg.selectAll('g')
-      .data(mideast)
+      .data(middle_east_plus_india)
       .enter()
       .append('g')
       // draw countries
@@ -434,11 +440,10 @@
         console.log("find_country couldn't find")
         console.log(id)
       }
-      // can't get united arab emirates to show up for some reason
+      
       country_group_inf_mitrate
         .append('path')
         .attr('d', function(country){
-          console.log(country.id)
           if (Object.keys(id_to_country).includes('' + country.id)){
             console.log(country.id)
             return pathGenerator2(country);
@@ -451,7 +456,6 @@
             [x_cent,y_cent] = projection(d3.geoPath().centroid(country));
             top_left_x = -x_cent*small_scale_country_id[country.id];
             top_left_y= -y_cent*small_scale_country_id[country.id];
-            country_short = id_to_acry[country.id]
             country_index = find_country_index(country.id)
             console.log(countryData[country_index] )
 
@@ -478,10 +482,6 @@
             country_index = find_country_index(country.id)
             if (countryData[country_index] != undefined){
               infant_x_text = xScale_infant_migrate(Number(countryData[country_index].InfantMort)) - 12;
-              if (countryData[country_index].CountryId == "422"){
-                console.log("Lebanon")
-                console.log(country_index)
-              }
               migrate_y_text = yScale_infant_migrate(Number(countryData[country_index].NetMigRate));
             }
             else{
@@ -495,13 +495,25 @@
         });
 
       // add axeses
+      var inf_mitrate_plot = infantMort_netmigrate_svg.append("g");
       inf_mitrate_plot.append("g").style("font", "10px times")
-        .call(botAxis_infant_mitrate).attr("transform","translate(10,293)");
+        .call(botAxis_infant_mitrate).attr("transform","translate(20,242)");
       inf_mitrate_plot.append("g").style("font", "10px times")
-        .call(leftAxis_infant_mitrate).attr("transform","translate(20,0)");
+        .call(leftAxis_infant_mitrate).attr("transform","translate(35,0)");
 
-
-
+      inf_mitrate_plot
+        .append("text")
+        .style("font-size", "12pt")
+        .attr("x","250")
+        .attr("y", "300")
+        .text("Infant Mortality Rate")
+      inf_mitrate_plot
+        .append("text")
+        .style("font-size", "12pt")
+        .attr("x","-250")
+        .attr("y", "15")
+        .attr("transform", "rotate(-90)")
+        .text("Net Migration Rate")
     }
 
 
