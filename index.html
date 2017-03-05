@@ -170,12 +170,18 @@
             //var migrationExtent = d3.extent(countryData,
             //     function (d) { return d.NetMigration; });
             var xScale = d3.scaleLinear().domain([0, 16]).range([20, 690]);
-            var migrationScale = d3.scaleLinear().domain([-385.6256,249.9996]).range([380, 20]);
+            var migrationScale = d3.scaleLinear().domain([-53.1362,249.9996]).range([340, 20]);
+
+           countryData = countryData.sort(function (a, b){
+                console.log(a.NetMigration)
+                return a.NetMigration  - b.NetMigration;
+            });
 
             i=0;
             countryData.forEach(function (d) {
                 if(d.Country in country_id){
-                    if (!isNaN(migrationScale(d.NetMigration))){
+                    console.log(d.NetMigration)
+                    if (d.NetMigration != 'underfined'){
                         y2 = migrationScale(d.NetMigration);
                         svgChart.append("line")
                         .attr("x1", xScale(i))
@@ -185,13 +191,6 @@
                         .style("stroke", "black")
                         .style("stroke-width", 20)
                         .style("opacity", 0.75)
-
-                        if(d.Country in country_id){
-                            countryName = country_id[d.Country].name;
-                        }
-                        else{
-                            countryName = d.Country;
-                        }
 
                         if(d.NetMigration<1){
                             svgChart.append("text")
