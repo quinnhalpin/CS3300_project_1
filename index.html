@@ -460,7 +460,7 @@
         .style("fill", "#196AA0");  //darkest blue
 
     svgZoom.append("text")
-        .text("High incoming migration rate")
+        .text("Highest incoming migration rate")
         .attr("x", 40)
         .attr("y", 413)
         .attr("font-size", "13px")
@@ -486,6 +486,39 @@
     //----------------Create Bar Chart of Net Migration----------------
     var xScale = d3.scaleLinear().domain([0, 15]).range([60, 905]);
     var migrationScale = d3.scaleLinear().domain([-80.0004,249.9996]).range([340, 20]);
+
+    //add axis and labels
+    var yAxis = d3.axisLeft(migrationScale);
+    var plot = svgChart.append("g");
+    plot.append("g").call(yAxis).attr("transform", "translate(30,0)").style("opacity", 0.75);
+    
+    svgChart.append("text")
+        .text("Highest incoming migration rate")
+        .attr("x", 15)
+        .attr("y", migrationScale(260))
+        .attr("font-size", "15px")
+        .style("fill", "black")
+        .attr("alignment-baseline", "central");
+
+    svgChart.append("text")
+        .text("Lowest outgoing migration rate")
+        .attr("x", 15)
+        .attr("y", migrationScale(-110))
+        .attr("font-size", "15px")
+        .style("fill", "black")
+        .attr("alignment-baseline", "central");
+
+
+    //Line at 0
+    svgChart.append("line")
+        .attr("x1", 30)
+        .attr("y1", migrationScale(0))
+        .attr("x2", 980)
+        .attr("y2", migrationScale(0))
+        .style("stroke", "black")
+        .style("stroke-width", .75)
+        .style("opacity", 0.75);
+
 
       //Sort the countryData by the net migration
     countryData.sort(function (a,b) {
