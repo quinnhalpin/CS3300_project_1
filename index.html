@@ -6,19 +6,24 @@
 	<script src="http://d3js.org/topojson.v2.min.js"></script>
 </head>
 <style>
-	svg { border: solid #ccc 1px; }
-  text { color: white; }
+	svg { border: solid #ccc 1px;
+    background-color: #ffffff; }
+    body {background-color: #ffffff;}
+    p {color: black;}
+
 </style>
-<body  >
-	<h1 > A Closer Look into the Middle East</h1>
-  <div id = "p1">
-		<p >
-		  Overview
+<body>
+  <div style=" color: #0074D9; font-size: 20pt" id = "header">
+    <h1 > Migration in the Middle East: Prediction vs Actual</h1>
+  </div>
+  <div  id = "p1">
+    <p >
+      An Overview of Number of People who Migrated in 2015
 		</p>
 	</div>
 	<div id = "p2">
 		<p>
-			Closer Look
+			Check out the Stats...
 		</p>
 	</div>
 	<div id = "p3">
@@ -62,10 +67,11 @@
     .style("background", "#FCFEFF");
     var trumpSvg = d3.select("#p6").append("svg").attr("width", 600).attr("height", 600).style("background", "#FCFEFF");
     var infantMort_netmigration_actual_svg = d3.select("#p7").append("svg").attr("width", 600).attr("height", 600).style("background", "#FCFEFF");
-
     d3.queue()
     .defer(d3.csv, "large-tabular.csv")
     .defer(d3.csv, "net_migration_mideast.csv")
+    .defer(d3.csv, "mortality_rate_mideast.csv")
+    .defer(d3.csv, "unemployment_rate_mideast.csv")
     .defer(d3.json, "world-50m.json")
     .defer(d3.json, "middle_east_pop_area.json")
     .await(done_function);
@@ -116,7 +122,6 @@
       "Iraq": {"ind":3, "id": 368}, 
     }
     banned_country = {
-      "IRN": {"ind":2, "id": 364}, 
       "IRQ": {"ind":3, "id": 368},
       "SYR": {"ind":12, "id": 760},  
       "YEM": {"ind":15, "id": 887},
@@ -124,7 +129,9 @@
       "SDN": {"ind":17, "id":736},
       "SOM": {"ind":18, "id":706}
     }
-    banned_id = [364,368,760,887,434,736,706];
+    old_ban = {"IRN": {"ind":2, "id": 364}};
+    banned_id = [368,760,887,434,736,706];
+    old_ban_id=[364];
    country_id = {
       "BHR": {"name":"Bahrain", "ind":0, "id":48}, 
       "EGY": {"name":"Egypt", "ind":1, "id": 818}, 
@@ -139,7 +146,7 @@
       "QAT": {"name":"Qatar", "ind":10, "id": 634}, 
       "SAU": {"name":"Saudi Arabia", "ind":11, "id": 682}, 
       "SYR": {"name":"Syria", "ind":12, "id": 760}, 
-      "ARE": {"name":"United Arab Emirates", "ind": 14, "id": 784}, 
+      "ARE": {"name":"U. Arab Emirates", "ind": 14, "id": 784}, 
       "TUR":{"name":"Turkey", "ind":13, "id": 792}, 
       "YEM": {"name":"Yemen", "ind":15, "id": 887},    
       "SDN": {"name": "Sudan", "ind":16, "id": 736} 
@@ -209,15 +216,23 @@
     
     /* This function returns an array countryData containing an object for each country with fields of the 2015 data for each variable*/
       
-    function done_function(error, csv_data, bank_csv, world_json_data, pop_area) {
+    function done_function(error, csv_data, bank_csv,mort_csv,unemploy_csv, world_json_data, pop_area) {
       dataset = csv_data;
       bankdata = bank_csv;
+      mortdata = mort_csv;
+      unempdata = unemploy_csv;
       nestedData = d3.nest()
       .key(function (d){ return d.REF_AREA;})
       .entries(csv_data);
       nestBankData = d3.nest()
       		.key(function(d){return d.Country_Name;})
       		.entries(bank_csv);
+      nestMortData = d3.nest()
+            .key(function(d){return d.Country_Name;})
+            .entries(mort_csv);
+      nestEmpData = d3.nest()
+            .key(function(d){return d.Country_Name;})
+            .entries(unemploy_csv);
             // Country bank has all values for netMigration stored with index 0 being 1960 and index 57 being 2016. Most values are empty strings but all are defined.
       countryBank = nestBankData.map(function(country){
             var bankResult = {Country: country.key};
@@ -231,6 +246,32 @@
             //threeCode is the Three digit country code
             bankResult.ThreeCode = country.values[0].Country_Code;
         return bankResult;
+      });
+      countryMort = nestMortData.map(function(country){
+            var mortResult = {Country: country.key};
+            yearValue = Object(country.values[0]);
+            var keys = Object.keys(yearValue).slice(0,57);
+            var values = Object.values(yearValue).slice(0,57);
+            mortResult.Years = keys;
+            mortResult.Values = values;
+            // Returns the 2012 value for InfantMort
+            mortResult.InfantMort = values[52];
+            //threeCode is the Three digit country code
+            mortResult.ThreeCode = country.values[0].Country_Code;
+        return mortResult;
+      });
+      countryUnemploy = nestEmpData.map(function(country){
+            var empResult = {Country: country.key};
+            yearValue = Object(country.values[0]);
+            var keys = Object.keys(yearValue).slice(0,57);
+            var values = Object.values(yearValue).slice(0,57);
+            empResult.Years = keys;
+            empResult.Values = values;
+            // Returns the 2012 value for InfantMort
+            empResult.Unemploy = values[52];
+            //threeCode is the Three digit country code
+            empResult.ThreeCode = country.values[0].Country_Code;
+        return empResult;
       });
       
 
@@ -270,10 +311,11 @@
 
     var scaleOrdinal = d3.scaleOrdinal(d3.schemeCategory20c);
     var redBlue = [  
-    /*reds dark to light:*/ "#E21223", "#F71629", "#FF3535", "#F75B60", "#fff",
-    /*blues light to dark:*/   "#3788BF", "#196AA0"];
+    /*reds dark to light:*/ "#E21223", "#F71629", "#FF3535", "#F75B60", "#fff", //red leaves
+    /*blues light to dark:*/   "#3788BF", "#196AA0"]; //green stay
     var grayColors = ['#d3d3d3','#d3d3d3'];
-    var colorScaleMap = d3.scaleLinear().domain([-17,-11.5,-6, -3 ,0,5.5,11]).range(redBlue);
+    var colorScaleMap = d3.scaleLinear().domain([-17,-50000,-6000, -300 ,0,655555.5,2000003]).range(redBlue);
+    // migration rate version: var colorScaleMap = d3.scaleLinear().domain([-17,-11.5,-6, -3 ,0,5.5,11]).range(redBlue);
     var grayScale = d3.scaleLinear().domain([0, 100]).range(grayColors);
         
       //----------------Add the zoomed out map svg----------------
@@ -295,14 +337,22 @@
     .style("stroke",function(country, ind) {
       	for (var i = banned_id.length - 1; i >= 0; i--) {		
       		if(country.id == banned_id[i] ){
-      			return "red";
-      		}
+      			return "#FFAE19";
+      		}else if(country.id == old_ban_id[0] ){
+                return "#98FB98";
+            }
         }
     })
+    .style("stroke-width", "3px")
     .style("fill", function(country, ind) {
         for (var i = 0; i < countryData.length; i++) {
             if(countryData[i].CountryId == country.id ){
-                return colorScaleMap(countryData[i].NetMigRate);
+                for (var k = countryBank.length -1; k >= 0; k--) {
+                    if (countryData[i].Country == countryBank[k].ThreeCode){
+                        return colorScaleMap(countryBank[k].NetMigration);
+                    }
+                }
+                
             }
         }
         return grayScale(ind+5 % 20);
@@ -338,14 +388,100 @@
         }
     })
     .attr("id", function(country){return country.id;})
+    .style("stroke",function(country, ind) {
+        for (var i = banned_id.length - 1; i >= 0; i--) {       
+            if(country.id == banned_id[i] ){
+                return "#FFAE19";
+            }else if(country.id == old_ban_id[0] ){
+                return "#98FB98";
+            }
+        }
+    })
+    .style("stroke-width", "4px")
     .style("fill", function(country, ind) {
         for (var i = 0; i < countryData.length; i++) {
-            if(countryData[i].CountryId == country.id){return colorScaleMap(countryData[i].NetMigRate);}
+            if(countryData[i].CountryId == country.id){for (var k = countryBank.length - 1; k >= 0; k--) {
+                    if (countryData[i].Country == countryBank[k].ThreeCode){
+                        return colorScaleMap(countryBank[k].NetMigration);
+                    }
+                };}
         }
         return grayScale(ind+5 % 20);
     });
+
+    //Add key for the Maps
+
+    svgZoom.append("rect")
+        .attr("x", 10)
+        .attr("y", 480)
+        .attr("width", 20)
+        .attr("height", 15)
+        .style("fill", "#E21223"); //dark red
+
+    svgZoom.append("text")
+        .text("Lowest outgoing migration rate")
+        .attr("x", 40)
+        .attr("y", 487)
+        .attr("font-size", "12px")
+        .style("fill", "black")
+        .attr("alignment-baseline", "central");
+
+    svgZoom.append("rect")
+        .attr("x", 10)
+        .attr("y", 460)
+        .attr("width", 20)
+        .attr("height", 15)
+        .style("fill", "#F75B60"); //light red
+
+    svgZoom.append("rect")
+        .attr("x", 10)
+        .attr("y", 440)
+        .attr("width", 20)
+        .attr("height", 15)
+        .style("stroke", "grey")
+        .style("stroke-width", "0.5px")
+        .style("fill", "#fff");
+
+    svgZoom.append("rect")
+        .attr("x", 10)
+        .attr("y", 420)
+        .attr("width", 20)
+        .attr("height", 15)
+        .style("fill", "#3788BF"); //light blue
+
+    svgZoom.append("rect")
+        .attr("x", 10)
+        .attr("y", 400)
+        .attr("width", 20)
+        .attr("height", 15)
+        .style("fill", "#196AA0");  //darkest blue
+
+    svgZoom.append("text")
+        .text("High incoming migration rate")
+        .attr("x", 40)
+        .attr("y", 407)
+        .attr("font-size", "12px")
+        .style("fill", "black")
+        .attr("alignment-baseline", "central");
+
+    svgZoom.append("line")
+        .attr("x1", 10)
+        .attr("y1", 385)
+        .attr("x2", 30)
+        .attr("y2", 385)
+        .style("stroke", "#FFAE19")
+        .style("stroke-width", 10);
+
+     svgZoom.append("text")
+        .text("Countries banned by Trump")
+        .attr("x", 40)
+        .attr("y", 385)
+        .attr("font-size", "12px")
+        .style("fill", "black")
+        .attr("alignment-baseline", "central");
+
     //----------------Create Bar Chart of Net Migration----------------
-    var xScale = d3.scaleLinear().domain([0, 15]).range([40, 655]);
+    var xScale = d3.scaleLinear().domain([0, 15]).range([60, 905]);
     var migrationScale = d3.scaleLinear().domain([-80.0004,249.9996]).range([340, 20]);
 
       //Sort the countryData by the net migration
@@ -357,42 +493,58 @@
     countryData.forEach(function (d) {
         if(d.Country in country_id){
             y2 = migrationScale(d.NetMigration);
-            console.log(d.NetMigration)
-            svgChart.append("line")
-            .attr("x1", xScale(i))
-            .attr("y1", migrationScale(0))
-            .attr("x2", xScale(i))
-            .attr("y2", y2)
-            .style("stroke", "black")
-            .style("stroke-width", 20)
-            .style("opacity", 0.75);
-
+            // console.log(country_id[d.Country].name + " " + d.NetMigration)
             if(d.NetMigration<1){
+                svgChart.append("line")
+                .attr("x1", xScale(i))
+                .attr("y1", migrationScale(0))
+                .attr("x2", xScale(i))
+                .attr("y2", y2)
+                .style("stroke", "#E21223")
+                .style("stroke-width", 22)
+                .style("opacity", 0.75);
+
                 svgChart.append("text")
                 .text(country_id[d.Country].name)
                 .attr("x", xScale(i))
                 .attr("y", y2+10)
-                .attr("font-size", "10px")
+                .attr("font-size", "12px")
                 .style("fill", "black")
                 .attr("text-anchor", "middle");
-                //.attr("alignment-baseline", "top")
-                // .attr("transform", "rotate(90)")
             }
             else if(d.Country=="ARE"){
+                svgChart.append("line")
+                .attr("x1", xScale(i))
+                .attr("y1", migrationScale(0))
+                .attr("x2", xScale(i))
+                .attr("y2", y2)
+                .style("stroke", "#196AA0")
+                .style("stroke-width", 22)
+                .style("opacity", 0.75);
+
                 svgChart.append("text")
                 .text(country_id[d.Country].name)
                 .attr("x", xScale(i)-6)
                 .attr("y", y2-5)
-                .attr("font-size", "10px")
+                .attr("font-size", "12px")
                 .style("fill", "black")
                 .attr("text-anchor", "middle");
             }
             else{
+                svgChart.append("line")
+                .attr("x1", xScale(i))
+                .attr("y1", migrationScale(0))
+                .attr("x2", xScale(i))
+                .attr("y2", y2)
+                .style("stroke", "#196AA0")
+                .style("stroke-width", 22)
+                .style("opacity", 0.75);
+
                 svgChart.append("text")
                 .text(country_id[d.Country].name)
                 .attr("x", xScale(i))
                 .attr("y", y2-5)
-                .attr("font-size", "10px")
+                .attr("font-size", "12px")
                 .style("fill", "black")
                 .attr("text-anchor", "middle");
             }
@@ -432,11 +584,9 @@
       // ---------Infant Mortality vs Net Migration Scatter Plot---------------
       // set up scales
       var xScale_infant_migrate = d3.scaleLinear().domain([-4120000, 2060000]).range([30, 950]); 
-      var yScale_infant_migrate = d3.scaleLinear().domain([0, 60]).range([950, 15]);
+      var yScale_infant_migrate = d3.scaleLinear().domain([0, 54]).range([950, 15]);
       var botAxis_infant_mitrate = d3.axisBottom(xScale_infant_migrate).ticks(5).tickSize(9);
       var leftAxis_infant_mitrate = d3.axisLeft(yScale_infant_migrate).ticks(5).tickSize(9);
-      //var xScale_infant_migrate_actual = d3.scaleLinear().domain([0, 40]).range([30, 950]);
-      //var yScale_infant_migrate_actual = d3.scaleLinear().domain([-200, 300]).range([450, 15]); 
       
       // set up country icons
       var country_group_inf_mitrate = infantMort_netmigration_projection_svg.selectAll('g')
@@ -487,15 +637,41 @@
         console.log("find_country couldn't find")
         console.log(country_name)
       }
+      function find_countryMort_index(country_name){
+        notFound = true;
+        if (country_name == "Egypt"){
+          country_name = "Egypt, Arab Rep.";
+        }
+        else if (country_name == "Iran"){
+          country_name = "Iran, Islamic Rep.";
+        }
+        else if (country_name == "Syria"){
+          country_name = "Syrian Arab Republic";
+        }
+        else if (country_name == "Yemen"){
+          country_name = "Yemen, Rep.";
+        }
+        
+        i = 0;
+        while (i < countryBank.length & notFound){
+          if (countryBank[i].Country == country_name){
+            notFound = false;
+            return i;
+          }
+          i += 1;
+        }
+        console.log("find_country couldn't find")
+        console.log(country_name)
+      }
       // actual data
       country_group_inf_mitrate
         .append('path')
         .attr('d', function(country){
             return pathGenerator2(country);
           })
-        .style("opacity", .3)
+        .style("opacity", 1)
         .style("fill", function(country, ind) {
-          return "blue";
+          return "orange";
         })
         .attr("transform", function(country, id) {
             [x_cent,y_cent] = projection(d3.geoPath().centroid(country));
@@ -503,11 +679,11 @@
             top_left_y= -y_cent*small_scale_country_id[country.id];
             country_name = id_to_country[country.id]
             country_index = find_countryBank_index(country_name)
+            country_mort_index = find_countryMort_index(country_name)
             console.log(countryBank[country_index] )
 
             if (countryBank[country_index] != undefined){
-              //infant_x = xScale_infant_migrate(Number(countryBank[country_index].InfantMort))
-              infant_y = 300;
+              infant_y = yScale_infant_migrate(Number(countryMort[country_mort_index].InfantMort))
               migrate_x = xScale_infant_migrate(Number(countryBank[country_index].NetMigration))
             }
             else{
@@ -526,10 +702,11 @@
         .append('text')
         .style("font-size", "10pt")
         .attr("transform", function(country,ind) {
-           country_name = id_to_country[country.id]
+            country_name = id_to_country[country.id]
+            country_mort_index = find_countryMort_index(country_name)
             country_index = find_countryBank_index(country_name)
             if (countryBank[country_index] != undefined){
-              infant_y_text = 300;
+              infant_y_text = yScale_infant_migrate(Number(countryMort[country_mort_index].InfantMort));
               migrate_x_text = xScale_infant_migrate(Number(countryBank[country_index].NetMigration)) - 10;
             }
             else{
@@ -552,19 +729,20 @@
           })
         .style("opacity", .3)
         .style("fill", function(country, ind) {
-          return "red";
+          return "purple";
         })
         .attr("transform", function(country, id) {
             [x_cent,y_cent] = projection(d3.geoPath().centroid(country));
             top_left_x = -x_cent*small_scale_country_id[country.id];
             top_left_y= -y_cent*small_scale_country_id[country.id];
-            country_short = id_to_acry[country.id]
             country_index = find_country_index(country.id)
             console.log(countryData[country_index] )
 
             if (countryData[country_index] != undefined){
               infant_y = yScale_infant_migrate(Number(countryData[country_index].InfantMort))
               migrate_x = xScale_infant_migrate(Number(countryData[country_index].NetMigration))
+              console.log("migrates")
+              console.log(migrate_x)
             }
             else{
               console.log("cannot find")
@@ -600,23 +778,60 @@
       // add axeses
       var inf_mitrate_plot = infantMort_netmigration_projection_svg.append("g");
       inf_mitrate_plot.append("g").style("font", "10px times")
-        .call(botAxis_infant_mitrate).attr("transform","translate(15,342)");
+        .call(botAxis_infant_mitrate).attr("transform","translate(0,950)");
       inf_mitrate_plot.append("g").style("font", "10px times")
-        .call(leftAxis_infant_mitrate).attr("transform","translate(658,0)");
-      inf_mitrate_plot
-        .append("text")
-        .style("font-size", "12pt")
-        .attr("x","300")
-        .attr("y", "400")
-        .text("Net Migration Projected")
+        .call(leftAxis_infant_mitrate).attr("transform","translate(643,0)");
       inf_mitrate_plot
         .append("text")
         .style("font-size", "12pt")
         .attr("x","-250")
-        .attr("y", "15")
+        .attr("y", "605")
         .attr("transform", "rotate(-90)")
-        .text("Infant Mortality Rate")
-      
+        .text("Infant Mortality")
+      inf_mitrate_plot
+        .append("text")
+        .style("font-size", "12pt")
+        .attr("x","50")
+        .attr("y", "940")
+        .text("# of People Leaving")
+      inf_mitrate_plot
+        .append("text")
+        .style("font-size", "12pt")
+        .attr("x","800")
+        .attr("y", "940")
+        .text("# of People Entering")
+
+      inf_mitrate_plot.append("rect")
+        .attr("x", 50)
+        .attr("y", 580)
+        .attr("width", 30)
+        .attr("height", 25)
+        .style("opacity", "1")
+        .style("fill", "orange"); 
+
+      inf_mitrate_plot.append("text")
+        .text("Projected during 2010 for 2015")
+        .attr("x", 90)
+        .attr("y", 592)
+        .attr("font-size", "20px")
+        .style("fill", "black")
+        .attr("alignment-baseline", "central");
+
+      inf_mitrate_plot.append("rect")
+        .attr("x", 50)
+        .attr("y", 620)
+        .attr("width", 30)
+        .attr("height", 25)
+        .style("opacity", ".4")
+        .style("fill", "purple"); 
+
+      inf_mitrate_plot.append("text")
+        .text("Actual Data from 2012")
+        .attr("x", 90)
+        .attr("y", 632)
+        .attr("font-size", "20px")
+        .style("fill", "black")
+        .attr("alignment-baseline", "central");
 
     // ---------TRUMP SCATTER PLOT---------------
       // set up scales
