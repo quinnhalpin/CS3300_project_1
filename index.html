@@ -31,16 +31,21 @@
 	</div>
     <div id = "p5">
         <p>
-            Infant Mortality vs Net Migration Rate
+            2010's projected Infant Mortality vs Net Migration Rate projected for 2015, 
         </p>
     </div>
     <div id = "p6">
         <p>
-  		    Trump Ban Countries
+  		    Trump Ban Countries excluding Somalia
         </p>
     </div>
+    <div id = "p7">
+      <p>
+        2012's actual Net Migration
+      </p>
+    </div>
 	<script type="text/javascript">
-    var dataset, nestedData, rawData, countries, popAreaData, nestBankData;
+    var dataset, nestedData, rawData, countries, popAreaData, nestBankData, countryBank;
     var projection = d3.geoMercator().scale(125);
     var projection_out = d3.geoMercator().scale(300);
     var projection3 = d3.geoMercator().scale(300);
@@ -50,11 +55,12 @@
         .style("background", "#FCFEFF"); //makes the svg map background light blue;
     var svgZoom = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500)
         .style("background", "#FCFEFF"); //makes the svg map background light blue;
-    var svg3 = d3.select("#p3").append("svg").attr("width", 500).attr("height", 500);
-    var svg4 = d3.select("#p4").append("svg").attr("width", 500).attr("height", 500);
+    var svgCircle = d3.select("#p3").append("svg").attr("width", 500).attr("height", 500);
+    var svgIcon = d3.select("#p4").append("svg").attr("width", 500).attr("height", 500);
     var svgChart = d3.select("#p2").append("svg").attr("width", 700).attr("height", 400);
-    var infantMort_netmigrate_svg = d3.select("#p5").append("svg").attr("width", 600).attr("height", 600);
-    var svg6 = d3.select("#p6").append("svg").attr("width", 500).attr("height", 500);
+    var infantMort_netmigration_projection_svg = d3.select("#p5").append("svg").attr("width", 600).attr("height", 600);
+    var trumpSvg = d3.select("#p6").append("svg").attr("width", 600).attr("height", 600);
+    var infantMort_netmigrate_actual_svg = d3.select("#p7").append("svg").attr("width", 600).attr("height", 600);
 
     d3.queue()
     .defer(d3.csv, "large-tabular.csv")
@@ -171,6 +177,7 @@
         "760": "Syria", 
         "784" : "United Arab Emirates",
         "792" : "Turkey",
+        "887": "Yemen",
     }
     id_to_country_Trump = {
         "48": "Bahrain",
@@ -188,7 +195,6 @@
         "760": "Syria", 
         "784" : "United Arab Emirates",
         "792" : "Turkey",
-        "887": "Yemen", 
         "887": "Yemen", 
         "434":"Libya",
         "736": "Sudan",
@@ -403,7 +409,7 @@
       
       i = 0;
       popAreaData.forEach(function(d){
-        g = svg3.append("g")
+        g = svgCircle.append("g")
           .attr("transform", "translate(" + xScale(i%4) + ", " + yScale(Math.floor(i/4)) + ")")
           .attr("cx", xScale(i%4))
           .attr("cy", yScale(Math.floor(i/4)));
@@ -418,9 +424,9 @@
           i += 1;
       });
       //----------------Create Icon for Every Country-------------------  
-      projection3.fitExtent([[-2800,-1200], [5*svg4.attr("width"), 5*svg4.attr("height")]], countries);
+      projection3.fitExtent([[-2800,-1200], [5*svgIcon.attr("width"), 5*svgIcon.attr("height")]], countries);
       pathGenerator3 = d3.geoPath().projection(projection3);
-      var paths_special = svg4.selectAll("path.country").data(countries.features);
+      var paths_special = svgIcon.selectAll("path.country").data(countries.features);
       country_for_id = function(val, arr){return Object.values(arr).reduce((a,x) => a.id || Object.key , false)}
       var xScaleCountry = d3.scaleLinear().domain([0,3]).range([100,900]);
       var yScaleCountry = d3.scaleLinear().domain([0,3]).range([100,900]);
@@ -431,7 +437,7 @@
       var mideastTrump = countries.features.filter((a) => banned_id.includes(a.id));
       
       var mideast = countries.features.filter((a) => id_to_ind.includes(a.id));
-      var groups = svg4.selectAll('g')
+      var groups = svgIcon.selectAll('g')
       .data(mideastTrump)
       .enter()
       .append('g')
@@ -465,17 +471,12 @@
         });
       // ---------Infant Mortality vs Migration Rate Scatter Plot---------------
       // set up scales
-      // var xScale_infant_migrate = d3.scaleLinear().domain([1, 60]).range([10, 450]);
-      // var yScale_infant_migrate = d3.scaleLinear().domain([-5, 12]).range([450, 10]); 
-      // var botAxis_infant_mitrate = d3.axisBottom(xScale_infant_migrate).ticks(10).tickSize(9);
-      // var leftAxis_infant_mitrate = d3.axisLeft(yScale_infant_migrate).ticks(10).tickSize(9);
-      var inf_mitrate_plot = infantMort_netmigrate_svg.append("g");
-      var xScale_infant_migrate = d3.scaleLinear().domain([0, 60]).range([15, 550]);
-      var yScale_infant_migrate = d3.scaleLinear().domain([-16, 12]).range([550, 15]); 
+      var xScale_infant_migrate = d3.scaleLinear().domain([0, 60]).range([30, 550]);
+      var yScale_infant_migrate = d3.scaleLinear().domain([-100, 300]).range([550, 15]); 
       var botAxis_infant_mitrate = d3.axisBottom(xScale_infant_migrate).ticks(5).tickSize(9);
       var leftAxis_infant_mitrate = d3.axisLeft(yScale_infant_migrate).ticks(5).tickSize(9);
       // set up country icons
-      var country_group_inf_mitrate = infantMort_netmigrate_svg.selectAll('g')
+      var country_group_inf_mitrate = infantMort_netmigration_projection_svg.selectAll('g')
       .data(mideast)
       .enter()
       .append('g')
@@ -502,15 +503,13 @@
         .append('path')
         .attr('d', function(country){
           console.log(country.id)
-          if (Object.keys(id_to_country).includes('' + country.id)){
-            console.log(country.id)
+          console.log(country.id)
             return pathGenerator2(country);
-          }})
+          })
         .style("fill", function(country, ind) {
           return scaleOrdinal(ind % 20);
         })
         .attr("transform", function(country, id) {
-          if (Object.keys(id_to_country).includes('' + country.id)){
             [x_cent,y_cent] = projection(d3.geoPath().centroid(country));
             top_left_x = -x_cent*small_scale_country_id[country.id];
             top_left_y= -y_cent*small_scale_country_id[country.id];
@@ -520,7 +519,7 @@
 
             if (countryData[country_index] != undefined){
               infant_x = xScale_infant_migrate(Number(countryData[country_index].InfantMort))
-              migrate_y = yScale_infant_migrate(Number(countryData[country_index].NetMigRate))
+              migrate_y = yScale_infant_migrate(Number(countryData[country_index].NetMigration))
             }
             else{
               console.log("cannot find")
@@ -530,40 +529,40 @@
             }
             return "translate("+ top_left_x +","+ top_left_y +")translate("+
             infant_x+","+migrate_y+")  scale(" + small_scale_country_id[country.id]+ ") ";
-          }
+          
         });
       // add country name
       country_group_inf_mitrate
         .append('text')
         .style("font-size", "10pt")
         .attr("transform", function(country,ind) {
-          if (Object.keys(id_to_country).includes('' + country.id)){
             country_index = find_country_index(country.id)
             if (countryData[country_index] != undefined){
               infant_x_text = xScale_infant_migrate(Number(countryData[country_index].InfantMort)) - 12;
-
-              migrate_y_text = yScale_infant_migrate(Number(countryData[country_index].NetMigRate));
+              migrate_y_text = yScale_infant_migrate(Number(countryData[country_index].NetMigration));
             }
             else{
               infant_x_text = 0;
               migrate_y_text = 0;
             }
             return "translate("+infant_x_text+","+migrate_y_text+")";
-          }})
+          })
         .text(function(country){
+          console.log(country.id)
           return id_to_country['' + country.id];
         });
 
       // add axeses
+      var inf_mitrate_plot = infantMort_netmigration_projection_svg.append("g");
       inf_mitrate_plot.append("g").style("font", "10px times")
-        .call(botAxis_infant_mitrate).attr("transform","translate(20,242)");
+        .call(botAxis_infant_mitrate).attr("transform","translate(15,416)");
       inf_mitrate_plot.append("g").style("font", "10px times")
-        .call(leftAxis_infant_mitrate).attr("transform","translate(35,0)");
+        .call(leftAxis_infant_mitrate).attr("transform","translate(45,0)");
       inf_mitrate_plot
         .append("text")
         .style("font-size", "12pt")
         .attr("x","250")
-        .attr("y", "300")
+        .attr("y", "400")
         .text("Infant Mortality Rate")
       inf_mitrate_plot
         .append("text")
@@ -571,20 +570,19 @@
         .attr("x","-250")
         .attr("y", "15")
         .attr("transform", "rotate(-90)")
-        .text("Net Migration Rate")
+        .text("Net Migration Projected")
       
 
     // ---------TRUMP SCATTER PLOT---------------
       // set up scales
-      var xScale_Trump = d3.scaleLinear().domain([1, 70]).range([10, 450]);
-      var yScale_Trump = d3.scaleLinear().domain([-5, 12]).range([450, 10]); 
+      var xScale_Trump = d3.scaleLinear().domain([1, 70]).range([30, 550]);
+      var yScale_Trump = d3.scaleLinear().domain([-40, 302]).range([550, 30]); 
       var botAxis_Trump = d3.axisBottom(xScale_Trump).ticks(10).tickSize(9);
       var leftAxis_Trump = d3.axisLeft(yScale_Trump).ticks(10).tickSize(9);
-      var Trump_plot = svg6.append("g");
       
       var mideastTrump = countries.features.filter((a) =>  banned_id.includes(a.id));
       // set up country icons
-      var country_group_Trump = svg6.selectAll('g')
+      var country_group_Trump = trumpSvg.selectAll('g')
       .data(mideastTrump)
       .enter()
       .append('g')
@@ -606,7 +604,6 @@
         console.log("find_country couldn't find")
         console.log(id)
       }
-      // can't get united arab emirates to show up for some reason
       country_group_Trump
         .append('path')
         .attr('d', function(country){
@@ -622,11 +619,11 @@
           top_left_y= -y_cent*small_scale_country_id[country.id];
           country_short = id_to_acry[country.id]
           country_index = find_country_index(country.id)
-          console.log(countryData[country_index] )
+          console.log(countryData[country_index])
 
           if (countryData[country_index] != undefined){
             infant_x = xScale_Trump(Number(countryData[country_index].InfantMort))
-            migrate_y = yScale_Trump(Number(countryData[country_index].NetMigRate))
+            migrate_y = yScale_Trump(Number(countryData[country_index].NetMigration))
           }
           else{
             console.log("cannot find")
@@ -644,8 +641,8 @@
           country_index = find_country_index(country.id)
           if (countryData[country_index] != undefined){
             infant_x_text = xScale_Trump(Number(countryData[country_index].InfantMort)) - 12;
-
-            migrate_y_text = yScale_Trump(Number(countryData[country_index].NetMigRate));
+            migrate_y_text = yScale_Trump(Number(countryData[country_index].NetMigration));
+            console.log(migrate_y_text)
           }
           else{
             infant_x_text = 0;
@@ -656,12 +653,24 @@
         .text(function(country){
           return id_to_country_Trump['' + country.id];
         });
-   
+        var Trump_plot = trumpSvg.append("g");
         Trump_plot.append("g").style("font", "10px times")
-        .call(botAxis_infant_mitrate).attr("transform","translate(10,293)");
+        .call(botAxis_infant_mitrate).attr("transform","translate(15,417)");
         Trump_plot.append("g").style("font", "10px times")
-        .call(leftAxis_infant_mitrate).attr("transform","translate(20,0)");
-
+        .call(leftAxis_infant_mitrate).attr("transform","translate(45,0)");
+        Trump_plot
+          .append("text")
+          .style("font-size", "12pt")
+          .attr("x","250")
+          .attr("y", "400")
+          .text("Infant Mortality Rate")
+        Trump_plot
+          .append("text")
+          .style("font-size", "12pt")
+          .attr("x","-250")
+          .attr("y", "15")
+          .attr("transform", "rotate(-90)")
+          .text("Net Migration Projected")
     }
 
 
