@@ -338,9 +338,10 @@
       	for (var i = banned_id.length - 1; i >= 0; i--) {		
       		if(country.id == banned_id[i] ){
       			return "#FFAE19";
-      		}else if(country.id == old_ban_id[0] ){
-                return "#98FB98";
-            }
+      		}
+            // else if(country.id == old_ban_id[0] ){
+            //     return "#98FB98";
+            // }
         }
     })
     .style("stroke-width", "3px")
@@ -392,9 +393,10 @@
         for (var i = banned_id.length - 1; i >= 0; i--) {       
             if(country.id == banned_id[i] ){
                 return "#FFAE19";
-            }else if(country.id == old_ban_id[0] ){
-                return "#98FB98";
             }
+            // else if(country.id == old_ban_id[0] ){
+            //     return "#98FB98";
+            // }
         }
     })
     .style("stroke-width", "4px")
@@ -413,7 +415,7 @@
 
     svgZoom.append("rect")
         .attr("x", 10)
-        .attr("y", 480)
+        .attr("y", 478)
         .attr("width", 20)
         .attr("height", 15)
         .style("fill", "#E21223"); //dark red
@@ -421,8 +423,8 @@
     svgZoom.append("text")
         .text("Lowest outgoing migration rate")
         .attr("x", 40)
-        .attr("y", 487)
-        .attr("font-size", "12px")
+        .attr("y", 485)
+        .attr("font-size", "13px")
         .style("fill", "black")
         .attr("alignment-baseline", "central");
 
@@ -435,7 +437,7 @@
 
     svgZoom.append("rect")
         .attr("x", 10)
-        .attr("y", 440)
+        .attr("y", 442)
         .attr("width", 20)
         .attr("height", 15)
         .style("stroke", "grey")
@@ -444,23 +446,23 @@
 
     svgZoom.append("rect")
         .attr("x", 10)
-        .attr("y", 420)
+        .attr("y", 424)
         .attr("width", 20)
         .attr("height", 15)
         .style("fill", "#3788BF"); //light blue
 
     svgZoom.append("rect")
         .attr("x", 10)
-        .attr("y", 400)
+        .attr("y", 406)
         .attr("width", 20)
         .attr("height", 15)
         .style("fill", "#196AA0");  //darkest blue
 
     svgZoom.append("text")
-        .text("High incoming migration rate")
+        .text("Highest incoming migration rate")
         .attr("x", 40)
-        .attr("y", 407)
-        .attr("font-size", "12px")
+        .attr("y", 413)
+        .attr("font-size", "13px")
         .style("fill", "black")
         .attr("alignment-baseline", "central");
 
@@ -476,13 +478,46 @@
         .text("Countries banned by Trump")
         .attr("x", 40)
         .attr("y", 385)
-        .attr("font-size", "12px")
+        .attr("font-size", "13px")
         .style("fill", "black")
         .attr("alignment-baseline", "central");
 
     //----------------Create Bar Chart of Net Migration----------------
     var xScale = d3.scaleLinear().domain([0, 15]).range([60, 905]);
     var migrationScale = d3.scaleLinear().domain([-80.0004,249.9996]).range([340, 20]);
+
+    //add axis and labels
+    var yAxis = d3.axisLeft(migrationScale);
+    var plot = svgChart.append("g");
+    plot.append("g").call(yAxis).attr("transform", "translate(30,0)").style("opacity", 0.75);
+    
+    svgChart.append("text")
+        .text("Highest incoming migration rate")
+        .attr("x", 15)
+        .attr("y", migrationScale(260))
+        .attr("font-size", "15px")
+        .style("fill", "black")
+        .attr("alignment-baseline", "central");
+
+    svgChart.append("text")
+        .text("Lowest outgoing migration rate")
+        .attr("x", 15)
+        .attr("y", migrationScale(-110))
+        .attr("font-size", "15px")
+        .style("fill", "black")
+        .attr("alignment-baseline", "central");
+
+
+    //Line at 0
+    svgChart.append("line")
+        .attr("x1", 30)
+        .attr("y1", migrationScale(0))
+        .attr("x2", 980)
+        .attr("y2", migrationScale(0))
+        .style("stroke", "black")
+        .style("stroke-width", .75)
+        .style("opacity", 0.75);
+
 
       //Sort the countryData by the net migration
     countryData.sort(function (a,b) {
