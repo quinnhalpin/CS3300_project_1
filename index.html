@@ -311,12 +311,14 @@
     }); 
 
     var scaleOrdinal = d3.scaleOrdinal(d3.schemeCategory20c);
-    var redBlue = [  
+    // var redBlue = [  
+    // /*reds dark to light:*/ "#E21223", "#F71629", "#FF3535", "#F75B60", "#fff",
+    // /*blues light to dark:*/   "#3788BF", "#29BF12"];
+    var redGreen = [  
     /*reds dark to light:*/ "#E21223", "#F71629", "#FF3535", "#F75B60", "#fff", //red leaves
-    /*blues light to dark:*/   "#3788BF", "#196AA0"]; //green stay
+    /*green light to dark:*/   "#ABFF4F", "#29BF12"]; //green stay
     var grayColors = ['#d3d3d3','#d3d3d3'];
-    var colorScaleMap = d3.scaleLinear().domain([-17,-50000,-6000, -300 ,0,655555.5,2000003]).range(redBlue);
-    // migration rate version: var colorScaleMap = d3.scaleLinear().domain([-17,-11.5,-6, -3 ,0,5.5,11]).range(redBlue);
+    var colorScaleMap = d3.scaleLinear().domain([-17,-50000,-6000, -300 ,0,655555.5,2000003]).range(redGreen);
     var grayScale = d3.scaleLinear().domain([0, 100]).range(grayColors);
         
       //----------------Add the zoomed out map svg----------------
@@ -340,9 +342,6 @@
       		if(country.id == banned_id[i] ){
       			return "#FFAE19";
       		}
-            // else if(country.id == old_ban_id[0] ){
-            //     return "#98FB98";
-            // }
         }
     })
     .style("stroke-width", "3px")
@@ -395,9 +394,6 @@
             if(country.id == banned_id[i] ){
                 return "#FFAE19";
             }
-            // else if(country.id == old_ban_id[0] ){
-            //     return "#98FB98";
-            // }
         }
     })
     .style("stroke-width", "4px")
@@ -450,14 +446,14 @@
         .attr("y", 424)
         .attr("width", 20)
         .attr("height", 15)
-        .style("fill", "#3788BF"); //light blue
+        .style("fill", "#ABFF4F"); //light green
 
     svgZoom.append("rect")
         .attr("x", 10)
         .attr("y", 406)
         .attr("width", 20)
         .attr("height", 15)
-        .style("fill", "#196AA0");  //darkest blue
+        .style("fill", "#29BF12");  //darkest green
 
     svgZoom.append("text")
         .text("Highest incoming migration rate")
@@ -554,7 +550,7 @@
                 .attr("y1", migrationScale(0))
                 .attr("x2", xScale(i))
                 .attr("y2", y2)
-                .style("stroke", "#196AA0")
+                .style("stroke", "#29BF12")
                 .style("stroke-width", 22)
                 .style("opacity", 0.75);
 
@@ -572,7 +568,7 @@
                 .attr("y1", migrationScale(0))
                 .attr("x2", xScale(i))
                 .attr("y2", y2)
-                .style("stroke", "#196AA0")
+                .style("stroke", "#29BF12")
                 .style("stroke-width", 22)
                 .style("opacity", 0.75);
 
