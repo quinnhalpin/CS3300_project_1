@@ -47,8 +47,10 @@
     var projection3 = d3.geoMercator().scale(300);
     var pathGenerator2 = d3.geoPath().projection(projection);
     var pathGenerator3 = d3.geoPath().projection(projection3);
-    var svgMap = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
-    var svgZoom = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
+    var svgMap = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500)
+        .style("background", "#FCFEFF"); //makes the svg map background light blue;
+    var svgZoom = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500)
+        .style("background", "#FCFEFF"); //makes the svg map background light blue;
     var svg3 = d3.select("#p3").append("svg").attr("width", 500).attr("height", 500);
     var svg4 = d3.select("#p4").append("svg").attr("width", 500).attr("height", 500);
     var svgChart = d3.select("#p2").append("svg").attr("width", 700).attr("height", 400);
