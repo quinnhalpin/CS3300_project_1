@@ -62,9 +62,10 @@
         .style("background", "#FCFEFF"); //makes the svg map background light blue;
     var svgCircle = d3.select("#p3").append("svg").attr("width", 500).attr("height", 500);
     var svgIcon = d3.select("#p4").append("svg").attr("width", 500).attr("height", 500);
-    var svgChart = d3.select("#p2").append("svg").attr("width", 1000).attr("height", 400);
-    var infantMort_netmigration_projection_svg = d3.select("#p5").append("svg").attr("width", 600).attr("height", 600);
-    var trumpSvg = d3.select("#p6").append("svg").attr("width", 600).attr("height", 600);
+    var svgChart = d3.select("#p2").append("svg").attr("width", 1000).attr("height", 400).style("background", "#FCFEFF"); //makes the svg map background light blue
+    var infantMort_netmigration_projection_svg = d3.select("#p5").append("svg").attr("width", 600).attr("height", 600).style("background", "#FCFEFF");
+    var trumpSvg = d3.select("#p6").append("svg").attr("width", 600).attr("height", 600)
+    .style("background", "#FCFEFF"); //makes the svg map background light blue
     var infantMort_netmigrate_actual_svg = d3.select("#p7").append("svg").attr("width", 600).attr("height", 600);
 
     d3.queue()
@@ -347,7 +348,7 @@
     .style("fill", function(country, ind) {
         for (var i = 0; i < countryData.length; i++) {
             if(countryData[i].CountryId == country.id ){
-                for (var k = countryBank.length - 1; k >= 0; k--) {
+                for (var k = countryBank.length -1; k >= 0; k--) {
                     if (countryData[i].Country == countryBank[k].ThreeCode){
                         return colorScaleMap(countryBank[k].NetMigration);
                     }
