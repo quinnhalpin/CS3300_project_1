@@ -218,7 +218,7 @@
       		.key(function(d){return d.Country_Name;})
       		.entries(bank_csv);
             // Country bank has all values for netMigration stored with index 0 being 1960 and index 57 being 2016. Most values are empty strings but all are defined.
-        countryBank = nestBankData.map(function(country){
+      countryBank = nestBankData.map(function(country){
             var bankResult = {Country: country.key};
             yearValue = Object(country.values[0]);
             var keys = Object.keys(yearValue).slice(0,57);
@@ -674,7 +674,8 @@
           .attr("transform", "rotate(-90)")
           .text("Net Migration Projected")
     }
-
+    // ----------- Actual 2012 Data on Net Migration --------------------
+    
 
 	 </script>
 </body>
