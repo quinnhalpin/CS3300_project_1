@@ -16,7 +16,7 @@
 	</div>
 	<div id = "p2">
 		<p>
-			Closer Look
+			Check out the Stats...
 		</p>
 	</div>
 	<div id = "p3">
@@ -57,7 +57,7 @@
         .style("background", "#FCFEFF"); //makes the svg map background light blue;
     var svgCircle = d3.select("#p3").append("svg").attr("width", 500).attr("height", 500);
     var svgIcon = d3.select("#p4").append("svg").attr("width", 500).attr("height", 500);
-    var svgChart = d3.select("#p2").append("svg").attr("width", 700).attr("height", 400);
+    var svgChart = d3.select("#p2").append("svg").attr("width", 1000).attr("height", 400);
     var infantMort_netmigration_projection_svg = d3.select("#p5").append("svg").attr("width", 600).attr("height", 600);
     var trumpSvg = d3.select("#p6").append("svg").attr("width", 600).attr("height", 600);
     var infantMort_netmigrate_actual_svg = d3.select("#p7").append("svg").attr("width", 600).attr("height", 600);
@@ -138,7 +138,7 @@
       "QAT": {"name":"Qatar", "ind":10, "id": 634}, 
       "SAU": {"name":"Saudi Arabia", "ind":11, "id": 682}, 
       "SYR": {"name":"Syria", "ind":12, "id": 760}, 
-      "ARE": {"name":"United Arab Emirates", "ind": 14, "id": 784}, 
+      "ARE": {"name":"U. Arab Emirates", "ind": 14, "id": 784}, 
       "TUR":{"name":"Turkey", "ind":13, "id": 792}, 
       "YEM": {"name":"Yemen", "ind":15, "id": 887},    
       "SDN": {"name": "Sudan", "ind":16, "id": 736} 
@@ -269,8 +269,8 @@
 
     var scaleOrdinal = d3.scaleOrdinal(d3.schemeCategory20c);
     var redBlue = [  
-    /*reds dark to light:*/ "#E21223", "#F71629", "#FF3535", "#F75B60", "#fff",
-    /*blues light to dark:*/   "#3788BF", "#196AA0"];
+    /*reds dark to light:*/ "#E21223", "#F71629", "#FF3535", "#F75B60", "#fff", //red leaves
+    /*blues light to dark:*/   "#3788BF", "#196AA0"]; //green stay
     var grayColors = ['#d3d3d3','#d3d3d3'];
     var colorScaleMap = d3.scaleLinear().domain([-17,-11.5,-6, -3 ,0,5.5,11]).range(redBlue);
     var grayScale = d3.scaleLinear().domain([0, 100]).range(grayColors);
@@ -294,10 +294,11 @@
     .style("stroke",function(country, ind) {
       	for (var i = banned_id.length - 1; i >= 0; i--) {		
       		if(country.id == banned_id[i] ){
-      			return "red";
+      			return "#FFAE19";
       		}
         }
     })
+    .style("stroke-width", "3px")
     .style("fill", function(country, ind) {
         for (var i = 0; i < countryData.length; i++) {
             if(countryData[i].CountryId == country.id ){
@@ -337,14 +338,94 @@
         }
     })
     .attr("id", function(country){return country.id;})
+    .style("stroke",function(country, ind) {
+        for (var i = banned_id.length - 1; i >= 0; i--) {       
+            if(country.id == banned_id[i] ){
+                return "#FFAE19";
+            }
+        }
+    })
+    .style("stroke-width", "4px")
     .style("fill", function(country, ind) {
         for (var i = 0; i < countryData.length; i++) {
             if(countryData[i].CountryId == country.id){return colorScaleMap(countryData[i].NetMigRate);}
         }
         return grayScale(ind+5 % 20);
     });
+
+    //Add key for the Maps
+
+    svgZoom.append("rect")
+        .attr("x", 10)
+        .attr("y", 480)
+        .attr("width", 20)
+        .attr("height", 15)
+        .style("fill", "#E21223"); //dark red
+
+    svgZoom.append("text")
+        .text("Lowest outgoing migration rate")
+        .attr("x", 40)
+        .attr("y", 487)
+        .attr("font-size", "12px")
+        .style("fill", "black")
+        .attr("alignment-baseline", "central");
+
+    svgZoom.append("rect")
+        .attr("x", 10)
+        .attr("y", 460)
+        .attr("width", 20)
+        .attr("height", 15)
+        .style("fill", "#F75B60"); //light red
+
+    svgZoom.append("rect")
+        .attr("x", 10)
+        .attr("y", 440)
+        .attr("width", 20)
+        .attr("height", 15)
+        .style("stroke", "grey")
+        .style("stroke-width", "0.5px")
+        .style("fill", "#fff");
+
+    svgZoom.append("rect")
+        .attr("x", 10)
+        .attr("y", 420)
+        .attr("width", 20)
+        .attr("height", 15)
+        .style("fill", "#3788BF"); //light blue
+
+    svgZoom.append("rect")
+        .attr("x", 10)
+        .attr("y", 400)
+        .attr("width", 20)
+        .attr("height", 15)
+        .style("fill", "#196AA0");  //darkest blue
+
+    svgZoom.append("text")
+        .text("High incoming migration rate")
+        .attr("x", 40)
+        .attr("y", 407)
+        .attr("font-size", "12px")
+        .style("fill", "black")
+        .attr("alignment-baseline", "central");
+
+    svgZoom.append("line")
+        .attr("x1", 10)
+        .attr("y1", 385)
+        .attr("x2", 30)
+        .attr("y2", 385)
+        .style("stroke", "#FFAE19")
+        .style("stroke-width", 10);
+
+     svgZoom.append("text")
+        .text("Countries banned by Trump")
+        .attr("x", 40)
+        .attr("y", 385)
+        .attr("font-size", "12px")
+        .style("fill", "black")
+        .attr("alignment-baseline", "central");
+
     //----------------Create Bar Chart of Net Migration----------------
-    var xScale = d3.scaleLinear().domain([0, 15]).range([40, 655]);
+    var xScale = d3.scaleLinear().domain([0, 15]).range([60, 905]);
     var migrationScale = d3.scaleLinear().domain([-80.0004,249.9996]).range([340, 20]);
 
       //Sort the countryData by the net migration
@@ -356,42 +437,58 @@
     countryData.forEach(function (d) {
         if(d.Country in country_id){
             y2 = migrationScale(d.NetMigration);
-            console.log(d.NetMigration)
-            svgChart.append("line")
-            .attr("x1", xScale(i))
-            .attr("y1", migrationScale(0))
-            .attr("x2", xScale(i))
-            .attr("y2", y2)
-            .style("stroke", "black")
-            .style("stroke-width", 20)
-            .style("opacity", 0.75);
-
+            // console.log(country_id[d.Country].name + " " + d.NetMigration)
             if(d.NetMigration<1){
+                svgChart.append("line")
+                .attr("x1", xScale(i))
+                .attr("y1", migrationScale(0))
+                .attr("x2", xScale(i))
+                .attr("y2", y2)
+                .style("stroke", "#E21223")
+                .style("stroke-width", 22)
+                .style("opacity", 0.75);
+
                 svgChart.append("text")
                 .text(country_id[d.Country].name)
                 .attr("x", xScale(i))
                 .attr("y", y2+10)
-                .attr("font-size", "10px")
+                .attr("font-size", "12px")
                 .style("fill", "black")
                 .attr("text-anchor", "middle");
-                //.attr("alignment-baseline", "top")
-                // .attr("transform", "rotate(90)")
             }
             else if(d.Country=="ARE"){
+                svgChart.append("line")
+                .attr("x1", xScale(i))
+                .attr("y1", migrationScale(0))
+                .attr("x2", xScale(i))
+                .attr("y2", y2)
+                .style("stroke", "#196AA0")
+                .style("stroke-width", 22)
+                .style("opacity", 0.75);
+
                 svgChart.append("text")
                 .text(country_id[d.Country].name)
                 .attr("x", xScale(i)-6)
                 .attr("y", y2-5)
-                .attr("font-size", "10px")
+                .attr("font-size", "12px")
                 .style("fill", "black")
                 .attr("text-anchor", "middle");
             }
             else{
+                svgChart.append("line")
+                .attr("x1", xScale(i))
+                .attr("y1", migrationScale(0))
+                .attr("x2", xScale(i))
+                .attr("y2", y2)
+                .style("stroke", "#196AA0")
+                .style("stroke-width", 22)
+                .style("opacity", 0.75);
+
                 svgChart.append("text")
                 .text(country_id[d.Country].name)
                 .attr("x", xScale(i))
                 .attr("y", y2-5)
-                .attr("font-size", "10px")
+                .attr("font-size", "12px")
                 .style("fill", "black")
                 .attr("text-anchor", "middle");
             }
