@@ -253,19 +253,13 @@
           return c.Country !== "undefined";
       }); 
 
-
-
-
       var scaleOrdinal = d3.scaleOrdinal(d3.schemeCategory20c);
-      var monochromaticColors = ['#46ff03','#3b9606','#186901'];
-      var complementaryColors = ['#e37d00','#39b80e','#0716ba'];
-      // Brown and blue['#1e38ab','#030200','#a86420'];
-      //Green and blue['#46ff03','#030200','#db7f15'];
-      // Green and red [#5bad0e,'#030200',#a80e59];
-      var grayColors = ['#d3d3d3','#d3d3d3'];
+      var redBlue = [  
+        /*reds dark to light:*/ "#E21223", "#F71629", "#FF3535", "#F75B60", "#fff",
+        /*blues light to dark:*/   "#3788BF", "#196AA0"];
+        var grayColors = ['#d3d3d3','#d3d3d3'];
             // need to alter extents of population to scale
-      var colorScaleBig = d3.scaleLinear().domain([-16.9,0,11.9]).range(complementaryColors); // MIgration scale
-      var colorScaleZoom = d3.scaleLinear().domain([-16,0,11.0]).range(complementaryColors); // MIgration scale
+        var colorScaleMap = d3.scaleLinear().domain([-17,-11.5,-6, -3 ,0,5.5,11]).range(redBlue);
       var grayScale = d3.scaleLinear().domain([0, 100]).range(grayColors);
             
       //----------------Add the zoomed out map svg----------------
@@ -293,11 +287,11 @@
         }
       })
       .style("fill", function(country, ind) {
-                    	// This seems like an inefficient way of doing this..
-        	for (var i = 0; i <= countryData.length - 1; i++) {
-           	 	 if(countryData[i].CountryId == country.id ){
-                   	return colorScaleBig(countryData[i].NetMigRate); }
-           	 	 }
+            for (var i = 0; i < countryData.length; i++) {
+                 if(countryData[i].CountryId == country.id ){
+                    return colorScaleMap(countryData[i].NetMigRate);
+                }
+            }
         	return grayScale(ind+5 % 20);
        });
       svgMap.append("circle").attr("r", 124)
@@ -332,9 +326,8 @@
       })
       .attr("id", function(country){return country.id;})
       .style("fill", function(country, ind) {
-                    	// This seems like an inefficient way of doing this..
-         for (var i = 0; i <= countryData.length - 2; i++) {
-             if(countryData[i].CountryId == country.id){return colorScaleZoom(countryData[i].NetMigRate);}
+         for (var i = 0; i < countryData.length; i++) {
+            if(countryData[i].CountryId == country.id){return colorScaleMap(countryData[i].NetMigRate);}
           }
       return grayScale(ind+5 % 20);
       });
