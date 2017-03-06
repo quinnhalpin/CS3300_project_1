@@ -339,9 +339,10 @@
       	for (var i = banned_id.length - 1; i >= 0; i--) {		
       		if(country.id == banned_id[i] ){
       			return "#FFAE19";
-      		}else if(country.id == old_ban_id[0] ){
-                return "#98FB98";
-            }
+      		}
+            // else if(country.id == old_ban_id[0] ){
+            //     return "#98FB98";
+            // }
         }
     })
     .style("stroke-width", "3px")
@@ -393,9 +394,10 @@
         for (var i = banned_id.length - 1; i >= 0; i--) {       
             if(country.id == banned_id[i] ){
                 return "#FFAE19";
-            }else if(country.id == old_ban_id[0] ){
-                return "#98FB98";
             }
+            // else if(country.id == old_ban_id[0] ){
+            //     return "#98FB98";
+            // }
         }
     })
     .style("stroke-width", "4px")
@@ -414,7 +416,7 @@
 
     svgZoom.append("rect")
         .attr("x", 10)
-        .attr("y", 480)
+        .attr("y", 478)
         .attr("width", 20)
         .attr("height", 15)
         .style("fill", "#E21223"); //dark red
@@ -422,8 +424,8 @@
     svgZoom.append("text")
         .text("Lowest outgoing migration rate")
         .attr("x", 40)
-        .attr("y", 487)
-        .attr("font-size", "12px")
+        .attr("y", 485)
+        .attr("font-size", "13px")
         .style("fill", "black")
         .attr("alignment-baseline", "central");
 
@@ -436,7 +438,7 @@
 
     svgZoom.append("rect")
         .attr("x", 10)
-        .attr("y", 440)
+        .attr("y", 442)
         .attr("width", 20)
         .attr("height", 15)
         .style("stroke", "grey")
@@ -445,14 +447,14 @@
 
     svgZoom.append("rect")
         .attr("x", 10)
-        .attr("y", 420)
+        .attr("y", 424)
         .attr("width", 20)
         .attr("height", 15)
         .style("fill", "#3788BF"); //light blue
 
     svgZoom.append("rect")
         .attr("x", 10)
-        .attr("y", 400)
+        .attr("y", 406)
         .attr("width", 20)
         .attr("height", 15)
         .style("fill", "#196AA0");  //darkest blue
@@ -460,8 +462,8 @@
     svgZoom.append("text")
         .text("High incoming migration rate")
         .attr("x", 40)
-        .attr("y", 407)
-        .attr("font-size", "12px")
+        .attr("y", 413)
+        .attr("font-size", "13px")
         .style("fill", "black")
         .attr("alignment-baseline", "central");
 
@@ -477,7 +479,7 @@
         .text("Countries banned by Trump")
         .attr("x", 40)
         .attr("y", 385)
-        .attr("font-size", "12px")
+        .attr("font-size", "13px")
         .style("fill", "black")
         .attr("alignment-baseline", "central");
 
