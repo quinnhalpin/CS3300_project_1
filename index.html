@@ -41,8 +41,10 @@
     var projection3 = d3.geoMercator().scale(300);
     var pathGenerator2 = d3.geoPath().projection(projection);
     var pathGenerator3 = d3.geoPath().projection(projection3);
-    var svgMap = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
-    var svgZoom = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500);
+    var svgMap = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500)
+                .style("background", "#FCFDFF"); //makes the svg map background light blue
+    var svgZoom = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500)
+                .style("background", "#FCFDFF");
     var svg3 = d3.select("#p3").append("svg").attr("width", 500).attr("height", 500);
     var svg4 = d3.select("#p4").append("svg").attr("width", 500).attr("height", 500);
     var svgChart = d3.select("#p2").append("svg").attr("width", 700).attr("height", 400);
@@ -97,14 +99,14 @@
       "Iraq": {"ind":3, "id": 368}, 
     }
     banned_country = {
-            "IRN": {"ind":2, "id": 364}, 
-            "IRQ": {"ind":3, "id": 368},
-            "SYR": {"ind":12, "id": 760},  
-            "YEM": {"ind":15, "id": 887},
-            "LBY": {"ind":16, "id":434},
-            "SDN": {"ind":17, "id":736},
-            "SOM": {"ind":18, "id":706}
-        }
+        "IRN": {"ind":2, "id": 364}, 
+        "IRQ": {"ind":3, "id": 368},
+        "SYR": {"ind":12, "id": 760},  
+        "YEM": {"ind":15, "id": 887},
+        "LBY": {"ind":16, "id":434},
+        "SDN": {"ind":17, "id":736},
+        "SOM": {"ind":18, "id":706}
+    }
    country_id = {
       "BHR": {"name":"Bahrain", "ind":0, "id":48}, 
       "EGY": {"name":"Egypt", "ind":1, "id": 818}, 
@@ -205,6 +207,11 @@
           return c.Country !== "undefined";
       }); 
 
+      //Sort the countryData by the net migration
+      countryData.sort(function (a,b) {
+          return parseFloat(a.NetMigration) - parseFloat(b.NetMigration);
+      });
+
       var scaleOrdinal = d3.scaleOrdinal(d3.schemeCategory20c);
       var monochromaticColors = ['#46ff03','#3b9606','#186901'];
       var complementaryColors = ['#e37d00','#39b80e','#0716ba'];
@@ -212,9 +219,14 @@
       //Green and blue['#46ff03','#030200','#db7f15'];
       // Green and red [#5bad0e,'#030200',#a80e59];
       var grayColors = ['#d3d3d3','#d3d3d3'];
-            // need to alter extents of population to scale
-      var colorScaleBig = d3.scaleLinear().domain([-159,0,119]).range(complementaryColors); // MIgration scale
-      var colorScaleZoom = d3.scaleLinear().domain([-59,0,60]).range(complementaryColors); // MIgration scale
+
+      var redBlue = [
+            /*reds dark to light:*/ "#E21D2D", "#FF3041", "#F75B5B", "#fff",
+            /*blues light to dark:*/   "#4281AA", "#346687"];
+            //extra red  "#78C0E0",
+
+
+      var colorScaleMap = d3.scaleLinear().domain([-400,-237.5,-75,0,125,250]).range(redBlue); // Migration scale
       var grayScale = d3.scaleLinear().domain([0, 100]).range(grayColors);
             
       //----------------Add the zoomed out map svg----------------
@@ -239,13 +251,26 @@
       	}
       })
       .style("fill", function(country, ind) {
-                    	// This seems like an inefficient way of doing this..
-        	for (var i = 0; i <= countryData.length - 1; i++) {
-           	 	 if(countryData[i].CountryId == country.id ){
-                   	return colorScaleBig(countryData[i].NetMigration); }
-           	 	 }
-        	return grayScale(ind+5 % 20);
-       });
+        for (var i = 0; i <= countryData.length - 1; i++) {
+            if(countryData[i].CountryId == country.id ){
+                console.log("net:" +countryData[i].NetMigration)
+                return colorScaleMap(countryData[i].NetMigration); 
+            }
+        }
+        return grayScale(ind+5 % 20);
+      }
+      //tried to fix the for loop above but couldnt figure it out
+      //   function(){
+      //   countryData.forEach(function (d) {
+      //       if((d.Country in country_id) && (country_id[d.Country].id == country.id)){
+      //           console.log("net:" + d.NetMigration)
+      //           return colorScaleMap(d.NetMigration);
+      //       }
+      //   });
+      // }
+
+
+      );
       svgMap.append("circle").attr("r", 124)
         .style("fill", "none")
         .style("stroke", "black")
@@ -267,6 +292,7 @@
         .attr("y2", 500)
         .style("stroke", "black")
         .style("stroke-width", 1);
+
       //----------------Create the zoomed in map----------------
       var paths = svgZoom.selectAll("path.country").data(countries.features);
       paths.enter().append("path").attr("class", "country")
@@ -280,7 +306,7 @@
       .style("fill", function(country, ind) {
                     	// This seems like an inefficient way of doing this..
          for (var i = 0; i <= countryData.length - 2; i++) {
-             if(countryData[i].CountryId == country.id){return colorScaleZoom(countryData[i].NetMigration);}
+             if(countryData[i].CountryId == country.id){return colorScaleMap(countryData[i].NetMigration);}
           }
       return grayScale(ind+5 % 20);
       });
@@ -290,17 +316,10 @@
       var xScale = d3.scaleLinear().domain([0, 15]).range([40, 655]);
       var migrationScale = d3.scaleLinear().domain([-80.0004,249.9996]).range([340, 20]);
 
-      //Sort the countryData by the net migration
-      countryData.sort(function (a,b) {
-          return parseFloat(a.NetMigration) - parseFloat(b.NetMigration);
-      });
-
       i=0;
       countryData.forEach(function (d) {
         if(d.Country in country_id){
           y2 = migrationScale(d.NetMigration);
-
-          console.log(d.NetMigration)
           svgChart.append("line")
           .attr("x1", xScale(i))
           .attr("y1", migrationScale(0))
