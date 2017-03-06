@@ -35,7 +35,7 @@
     </p>
   </div>
 	<script type="text/javascript">
-    var dataset, nestedData, rawData, countries, popAreaData;
+    var dataset, nestedData, rawData, countries, popAreaData, actual_net_migration;
     var projection = d3.geoMercator().scale(125);
     var projection_out = d3.geoMercator().scale(300);
     var projection3 = d3.geoMercator().scale(300);
@@ -169,6 +169,7 @@
 
     /* This function returns an array countryData containing an object for each country with fields of the 2015 data for each variable*/
     function done_function(error, csv_data, world_json_data, pop_area) {
+      
       dataset= csv_data;
       nestedData = d3.nest()
       .key(function (d){ return d.REF_AREA;}).entries(csv_data);
