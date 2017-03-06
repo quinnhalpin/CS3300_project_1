@@ -6,10 +6,15 @@
 	<script src="http://d3js.org/topojson.v2.min.js"></script>
 </head>
 <style>
-	svg { border: solid #ccc 1px; }
+	svg { border: solid #ccc 1px;
+    background-color: #2f2f2f; }
+    body {background-color: #2f2f2f;}
+    p {color: #ffd700;}
+
 </style>
 <body>
 	<div id = "p1">
+    <h1></h1>
 		<p>
 			CS: 3300 Project 1: Static Visualization of Migration in the Middle East
 		</p>
@@ -65,6 +70,8 @@
     d3.queue()
     .defer(d3.csv, "large-tabular.csv")
     .defer(d3.csv, "net_migration_mideast.csv")
+    .defer(d3.csv, "mortality_rate_mideast.csv")
+    .defer(d3.csv, "unemployment_rate_mideast.csv")
     .defer(d3.json, "world-50m.json")
     .defer(d3.json, "middle_east_pop_area.json")
     .await(done_function);
@@ -115,7 +122,6 @@
       "Iraq": {"ind":3, "id": 368}, 
     }
     banned_country = {
-      "IRN": {"ind":2, "id": 364}, 
       "IRQ": {"ind":3, "id": 368},
       "SYR": {"ind":12, "id": 760},  
       "YEM": {"ind":15, "id": 887},
@@ -123,7 +129,9 @@
       "SDN": {"ind":17, "id":736},
       "SOM": {"ind":18, "id":706}
     }
-    banned_id = [364,368,760,887,434,736,706];
+    old_ban = {"IRN": {"ind":2, "id": 364}};
+    banned_id = [368,760,887,434,736,706];
+    old_ban_id=[364];
    country_id = {
       "BHR": {"name":"Bahrain", "ind":0, "id":48}, 
       "EGY": {"name":"Egypt", "ind":1, "id": 818}, 
@@ -208,15 +216,23 @@
     
     /* This function returns an array countryData containing an object for each country with fields of the 2015 data for each variable*/
       
-    function done_function(error, csv_data, bank_csv, world_json_data, pop_area) {
+    function done_function(error, csv_data, bank_csv,mort_csv,unemploy_csv, world_json_data, pop_area) {
       dataset = csv_data;
       bankdata = bank_csv;
+      mortdata = mort_csv;
+      unempdata = unemploy_csv;
       nestedData = d3.nest()
       .key(function (d){ return d.REF_AREA;})
       .entries(csv_data);
       nestBankData = d3.nest()
       		.key(function(d){return d.Country_Name;})
       		.entries(bank_csv);
+      nestMortData = d3.nest()
+            .key(function(d){return d.Country_Name;})
+            .entries(mort_csv);
+      nestEmpData = d3.nest()
+            .key(function(d){return d.Country_Name;})
+            .entries(unemploy_csv);
             // Country bank has all values for netMigration stored with index 0 being 1960 and index 57 being 2016. Most values are empty strings but all are defined.
       countryBank = nestBankData.map(function(country){
             var bankResult = {Country: country.key};
@@ -230,6 +246,32 @@
             //threeCode is the Three digit country code
             bankResult.ThreeCode = country.values[0].Country_Code;
         return bankResult;
+      });
+      countryMort = nestMortData.map(function(country){
+            var mortResult = {Country: country.key};
+            yearValue = Object(country.values[0]);
+            var keys = Object.keys(yearValue).slice(0,57);
+            var values = Object.values(yearValue).slice(0,57);
+            mortResult.Years = keys;
+            mortResult.Values = values;
+            // Returns the 2012 value for InfantMort
+            mortResult.InfantMort = values[52];
+            //threeCode is the Three digit country code
+            mortResult.ThreeCode = country.values[0].Country_Code;
+        return mortResult;
+      });
+      countryUnemploy = nestEmpData.map(function(country){
+            var empResult = {Country: country.key};
+            yearValue = Object(country.values[0]);
+            var keys = Object.keys(yearValue).slice(0,57);
+            var values = Object.values(yearValue).slice(0,57);
+            empResult.Years = keys;
+            empResult.Values = values;
+            // Returns the 2012 value for InfantMort
+            empResult.Unemploy = values[52];
+            //threeCode is the Three digit country code
+            empResult.ThreeCode = country.values[0].Country_Code;
+        return empResult;
       });
       
 
@@ -272,7 +314,8 @@
     /*reds dark to light:*/ "#E21223", "#F71629", "#FF3535", "#F75B60", "#fff", //red leaves
     /*blues light to dark:*/   "#3788BF", "#196AA0"]; //green stay
     var grayColors = ['#d3d3d3','#d3d3d3'];
-    var colorScaleMap = d3.scaleLinear().domain([-17,-11.5,-6, -3 ,0,5.5,11]).range(redBlue);
+    var colorScaleMap = d3.scaleLinear().domain([-17,-50000,-6000, -300 ,0,655555.5,2000003]).range(redBlue);
+    // migration rate version: var colorScaleMap = d3.scaleLinear().domain([-17,-11.5,-6, -3 ,0,5.5,11]).range(redBlue);
     var grayScale = d3.scaleLinear().domain([0, 100]).range(grayColors);
         
       //----------------Add the zoomed out map svg----------------
@@ -295,14 +338,21 @@
       	for (var i = banned_id.length - 1; i >= 0; i--) {		
       		if(country.id == banned_id[i] ){
       			return "#FFAE19";
-      		}
+      		}else if(country.id == old_ban_id[0] ){
+                return "#98FB98";
+            }
         }
     })
     .style("stroke-width", "3px")
     .style("fill", function(country, ind) {
         for (var i = 0; i < countryData.length; i++) {
             if(countryData[i].CountryId == country.id ){
-                return colorScaleMap(countryData[i].NetMigRate);
+                for (var k = countryBank.length - 1; k >= 0; k--) {
+                    if (countryData[i].Country == countryBank[k].ThreeCode){
+                        return colorScaleMap(countryBank[k].NetMigration);
+                    }
+                }
+                
             }
         }
         return grayScale(ind+5 % 20);
@@ -342,13 +392,19 @@
         for (var i = banned_id.length - 1; i >= 0; i--) {       
             if(country.id == banned_id[i] ){
                 return "#FFAE19";
+            }else if(country.id == old_ban_id[0] ){
+                return "#98FB98";
             }
         }
     })
     .style("stroke-width", "4px")
     .style("fill", function(country, ind) {
         for (var i = 0; i < countryData.length; i++) {
-            if(countryData[i].CountryId == country.id){return colorScaleMap(countryData[i].NetMigRate);}
+            if(countryData[i].CountryId == country.id){for (var k = countryBank.length - 1; k >= 0; k--) {
+                    if (countryData[i].Country == countryBank[k].ThreeCode){
+                        return colorScaleMap(countryBank[k].NetMigration);
+                    }
+                };}
         }
         return grayScale(ind+5 % 20);
     });
