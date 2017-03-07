@@ -36,10 +36,6 @@
         </p>
   </div>
   <div style = " font-size: 20pt" id = "p_explaination">
-        <p>
-        In 2010, the UN projected that Syria would have 300 people come into Syria during the year of 2015. They had no idea,
-        that in 2015, the Syrian Refugee Crisis would be in full swing.
-        </p>
         <p >
           In April of 2011, 5000 Refugees fleed harsh fighting in Talkalakh, Syria, sparking the Syrian Refugee Crisis. In June of 
           2011, the military seige of Jisr al-Shughour sparks a major flow of refugees into Turkey. By the
@@ -55,16 +51,15 @@
     var projection3 = d3.geoMercator().scale(300);
     var pathGenerator2 = d3.geoPath().projection(projection);
     var pathGenerator3 = d3.geoPath().projection(projection3);
-    var svgMap = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500)
+    var svgMap = d3.select("#p1").append("svg").attr("width", 800).attr("height", 800)
         .style("background", "#FCFEFF"); //makes the svg map background light blue;
-    var svgZoom = d3.select("#p1").append("svg").attr("width", 500).attr("height", 500)
+    var svgZoom = d3.select("#p1").append("svg").attr("width", 800).attr("height", 800)
         .style("background", "#FCFEFF"); //makes the svg map background light blue;
-    var svgChart = d3.select("#p2").append("svg").attr("width", 1100).attr("height", 400) .style("background", "#FCFEFF");
+    var svgChart = d3.select("#p2").append("svg").attr("width", 1200).attr("height", 550) .style("background", "#FCFEFF");
     var infantMort_netmigration_log_svg = d3.select("#p_scatter").append("svg").attr("width", 800).attr("height", 800).style("background", "#FCFEFF");
     var infantMort_netmigration_svg = d3.select("#p_scatter").append("svg").attr("width", 800).attr("height", 800)
     .style("background", "#FCFEFF");
-   // var trumpSvg = d3.select("#p6").append("svg").attr("width", 600).attr("height", 600).style("background", "#FCFEFF");
-    //var infantMort_netmigration_actual_svg = d3.select("#p7").append("svg").attr("width", 600).attr("height", 600).style("background", "#FCFEFF");
+   
     d3.queue()
     .defer(d3.csv, "large-tabular.csv")
     .defer(d3.csv, "net_migration_mideast.csv")
@@ -319,8 +314,8 @@
     rawData = world_json_data;
     countries = topojson.feature(rawData, rawData.objects.countries);
     id_in_dict = function(val, arr){return Object.values(arr).reduce((a,x) => a || val == x.id, false)}
-    projection_out.fitExtent([[-1500,-500], [3*svgMap.attr("width"), 3*svgMap.attr("height")]], countries);
-    projection.fitExtent([[-3582,-1500], [5.9*svgZoom.attr("width"), 5.9*svgZoom.attr("height")]], countries);
+    projection_out.fitExtent([[-2400,-850], [3*svgMap.attr("width"), 3*svgMap.attr("height")]], countries);
+    projection.fitExtent([[-5700,-2400], [5.87*svgZoom.attr("width"), 5.87*svgZoom.attr("height")]], countries);
     pathGenerator_out = d3.geoPath().projection(projection_out);
     pathGenerator2 = d3.geoPath().projection(projection);
     var path_all = svgMap.selectAll("path.country").data(countries.features);
@@ -355,25 +350,25 @@
         }
         return grayScale(ind+5 % 20);
     });
-    svgMap.append("circle").attr("r", 124)
+    svgMap.append("circle").attr("r", 202)
         .style("fill", "none")
         .style("stroke", "black")
-        .attr("cx", 247)
-        .attr("cy", 265);
+        .attr("cx", 403)
+        .attr("cy", 395);
     //line on top side of circle
     svgMap.append("line")
-        .attr("x1", 247) 
-        .attr("y1", 141) 
-        .attr("x2", 500)
+        .attr("x1", 403) 
+        .attr("y1", 193) 
+        .attr("x2", 800)
         .attr("y2", 0)
         .style("stroke", "black")
         .style("stroke-width", 1);
     //line on left side of circle
     svgMap.append("line")
-        .attr("x1", 247) 
-        .attr("y1", 389) 
-        .attr("x2", 500)
-        .attr("y2", 500)
+        .attr("x1", 403) 
+        .attr("y1", 597) 
+        .attr("x2", 800)
+        .attr("y2", 800)
         .style("stroke", "black")
         .style("stroke-width", 1);
 
@@ -420,10 +415,10 @@
         .attr("y2", "100%");
 
     svgZoom.append("rect")
-        .attr("x", 10)
-        .attr("y", 405)
+        .attr("x", 30)
+        .attr("y", 630)
         .attr("width", 20)
-        .attr("height", 90)
+        .attr("height", 150)
         .style("fill", "url(#linear-gradient)");
 
 
@@ -444,39 +439,38 @@
 
     svgZoom.append("text")
         .text("Highest incoming migration rate")
-        .attr("x", 40)
-        .attr("y", 410)
-        .attr("font-size", "13.5px")
+        .attr("x", 60)
+        .attr("y", 635)
+        .attr("font-size", "14px")
         .style("fill", "black")
         .attr("alignment-baseline", "central");
 
     svgZoom.append("text")
         .text("Lowest outgoing migration rate")
-        .attr("x", 40)
-        .attr("y", 487)
-        .attr("font-size", "13.5px")
+        .attr("x", 60)
+        .attr("y", 773)
+        .attr("font-size", "14px")
         .style("fill", "black")
         .attr("alignment-baseline", "central");
 
-    svgZoom.append("line")
-        .attr("x1", 10)
-        .attr("y1", 385)
-        .attr("x2", 30)
-        .attr("y2", 385)
-        .style("stroke", "#FFAE19")
-        .style("stroke-width", 10);
+    svgZoom.append("rect")
+        .attr("x", 30)
+        .attr("y", 600)
+        .attr("width", 20)
+        .attr("height", 10)
+        .style("fill", "#FFAE19");
 
      svgZoom.append("text")
         .text("Countries banned by Trump")
-        .attr("x", 40)
-        .attr("y", 385)
-        .attr("font-size", "13.5px")
+        .attr("x", 60)
+        .attr("y", 605)
+        .attr("font-size", "14px")
         .style("fill", "black")
         .attr("alignment-baseline", "central");
 
     //----------------Create Bar Chart of Net Migration----------------
-    var xScale = d3.scaleLinear().domain([0, 15]).range([60, 905]);
-    var migrationScale = d3.scaleLinear().domain([-80.0004,249.9996]).range([340, 20]);
+    var xScale = d3.scaleLinear().domain([0, 15]).range([60, 1085]);
+    var migrationScale = d3.scaleLinear().domain([-80.0004,249.9996]).range([490, 40]);
 
     //add axis and labels
     var yAxis = d3.axisLeft(migrationScale);
@@ -487,7 +481,7 @@
         .text("Highest incoming migration rate")
         .attr("x", 15)
         .attr("y", migrationScale(260))
-        .attr("font-size", "15px")
+        .attr("font-size", "20px")
         .style("fill", "black")
         .attr("alignment-baseline", "central");
 
@@ -495,7 +489,7 @@
         .text("Lowest outgoing migration rate")
         .attr("x", 15)
         .attr("y", migrationScale(-110))
-        .attr("font-size", "15px")
+        .attr("font-size", "20px")
         .style("fill", "black")
         .attr("alignment-baseline", "central");
 
@@ -504,7 +498,7 @@
     svgChart.append("line")
         .attr("x1", 30)
         .attr("y1", migrationScale(0))
-        .attr("x2", 980)
+        .attr("x2", 1185)
         .attr("y2", migrationScale(0))
         .style("stroke", "black")
         .style("stroke-width", .75)
@@ -528,14 +522,14 @@
                 .attr("x2", xScale(i))
                 .attr("y2", y2)
                 .style("stroke", "#E21223")
-                .style("stroke-width", 22)
+                .style("stroke-width", 25)
                 .style("opacity", 0.75);
 
                 svgChart.append("text")
                 .text(country_id[d.Country].name)
                 .attr("x", xScale(i))
-                .attr("y", y2+10)
-                .attr("font-size", "12px")
+                .attr("y", y2+15)
+                .attr("font-size", "14px")
                 .style("fill", "black")
                 .attr("text-anchor", "middle");
             }
@@ -546,14 +540,14 @@
                 .attr("x2", xScale(i))
                 .attr("y2", y2)
                 .style("stroke", "#29BF12")
-                .style("stroke-width", 22)
+                .style("stroke-width", 25)
                 .style("opacity", 0.75);
 
                 svgChart.append("text")
                 .text(country_id[d.Country].name)
                 .attr("x", xScale(i)-6)
-                .attr("y", y2-5)
-                .attr("font-size", "12px")
+                .attr("y", y2-10)
+                .attr("font-size", "14px")
                 .style("fill", "black")
                 .attr("text-anchor", "middle");
             }
@@ -564,14 +558,14 @@
                 .attr("x2", xScale(i))
                 .attr("y2", y2)
                 .style("stroke", "#29BF12")
-                .style("stroke-width", 22)
+                .style("stroke-width", 25)
                 .style("opacity", 0.75);
 
                 svgChart.append("text")
                 .text(country_id[d.Country].name)
                 .attr("x", xScale(i))
-                .attr("y", y2-5)
-                .attr("font-size", "12px")
+                .attr("y", y2-10)
+                .attr("font-size", "14px")
                 .style("fill", "black")
                 .attr("text-anchor", "middle");
             }
@@ -1227,8 +1221,5 @@
     //       .text("Net Migration Projected")
 
 	 </script>
-   <img src="syrian_refugees.png" style="width:604px;height:528px;">
-   <p style="font-size: 20pt"> In 2012, refugee camp Yarmouk, home to the largest Palestinian refugee community in Syria, was under harsh conflict between
-   the Free Syrian Army, government forces, and ISIS. </p>
 </body>
 </html>
