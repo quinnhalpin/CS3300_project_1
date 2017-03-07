@@ -514,18 +514,18 @@
             .style("stroke", "black")
             .attr("cx", 403)
             .attr("cy", 395);
-        //line on top side of circle
-        svgMap.append("line")
-            .attr("x1", 403)
-            .attr("y1", 193)
-            .attr("x2", 800)
-            .attr("y2", 0)
-            .style("stroke", "black")
-            .style("stroke-width", 1);
         //line on left side of circle
         svgMap.append("line")
-            .attr("x1", 403)
-            .attr("y1", 597)
+            .attr("x1", 201)
+            .attr("y1", 395)
+            .attr("x2", 0)
+            .attr("y2", 800)
+            .style("stroke", "black")
+            .style("stroke-width", 1);
+        //line on right side of circle
+        svgMap.append("line")
+            .attr("x1", 605)
+            .attr("y1", 395)
             .attr("x2", 800)
             .attr("y2", 800)
             .style("stroke", "black")
