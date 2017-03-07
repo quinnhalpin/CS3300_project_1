@@ -103,7 +103,7 @@
         .style("background", "#FCFEFF"); //makes the svg map background light blue;
     var svgChart = d3.select("#p2").append("svg").attr("width", 1200).attr("height", 550).style("background", "#FCFEFF");
     var svgChartActual = d3.select("#p2_actual").append("svg").attr("width", 1200).attr("height", 900).style("background", "#FCFEFF");
-    var infantMort_netmigration_svg = d3.select("#p_scatter").append("svg").attr("width", 800).attr("height", 800)
+    var infantMort_netmigration_svg = d3.select("#p_scatter").append("svg").attr("width", 1200).attr("height", 800)
         .style("background", "#FCFEFF");
 
     d3.queue()
@@ -1081,9 +1081,9 @@
 
         //---------- Infant Mortality vs Net Migration Scatter Linear Plot---------------
         // actual
-        var xScale_infant_migrate = d3.scaleLinear().domain([-4420000, 2060000]).range([30, 750]);
+        var xScale_infant_migrate = d3.scaleLinear().domain([-4420000, 2060000]).range([30, 1150]);
         // projected
-        var yScale_infant_migrate = d3.scaleLinear().domain([-100000, 300000]).range([725, 15]);
+        var yScale_infant_migrate = d3.scaleLinear().domain([-100000, 300000]).range([775, 15]);
         
         //var yScale_infant_migrate = d3.scaleLinear().domain([0, 64]).range([725, 15]);
         var botAxis_infant_migrate = d3.axisBottom(xScale_infant_migrate).ticks(8).tickSize(9);
