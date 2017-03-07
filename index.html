@@ -661,31 +661,29 @@
             .attr("alignment-baseline", "central");
 
         //----------------Create Bar Chart of Net Migration----------------
-        var xScale = d3.scaleLinear().domain([0, 15]).range([60, 1085]);
-        var migrationScale = d3.scaleLinear().domain([-80.0004, 249.9996]).range([490, 40]);
+        var xScale = d3.scaleLinear().domain([0, 57]).range([80, 1085]);
+        var migrationScale = d3.scaleLinear().domain([-5000000, 400000]).range([490, 40]);
 
         //add axis and labels
         var yAxis = d3.axisLeft(migrationScale);
         var plot = svgChart.append("g");
-        plot.append("g").call(yAxis).attr("transform", "translate(30,0)").style("opacity", 0.75);
+        plot.append("g").call(yAxis).attr("transform", "translate(60,0)").style("opacity", 0.75);
 
         svgChart.append("text")
             .text("Highest incoming migration rate")
-            .attr("x", 15)
-            .attr("y", migrationScale(260))
+            .attr("x", 70)
+            .attr("y", migrationScale(200060))
             .attr("font-size", "20px")
             .style("fill", "black")
             .attr("alignment-baseline", "central");
 
         svgChart.append("text")
             .text("Lowest outgoing migration rate")
-            .attr("x", 15)
-            .attr("y", migrationScale(-110))
+            .attr("x", 70)
+            .attr("y", migrationScale(-4500000))
             .attr("font-size", "20px")
             .style("fill", "black")
             .attr("alignment-baseline", "central");
-
-
         //Line at 0
         svgChart.append("line")
             .attr("x1", 30)
@@ -701,67 +699,52 @@
         countryData.sort(function(a, b) {
             return parseFloat(a.NetMigration) - parseFloat(b.NetMigration);
         });
-
-        i = 0;
-        countryData.forEach(function(d) {
-            if (d.Country in country_id) {
-                y2 = migrationScale(d.NetMigration);
-                // console.log(country_id[d.Country].name + " " + d.NetMigration)
-                if (d.NetMigration < 1) {
-                    svgChart.append("line")
-                        .attr("x1", xScale(i))
-                        .attr("y1", migrationScale(0))
-                        .attr("x2", xScale(i))
-                        .attr("y2", y2)
-                        .style("stroke", "#E21223")
-                        .style("stroke-width", 25)
-                        .style("opacity", 0.75);
-
-                    svgChart.append("text")
-                        .text(country_id[d.Country].name)
-                        .attr("x", xScale(i))
-                        .attr("y", y2 + 15)
-                        .attr("font-size", "14px")
-                        .style("fill", "black")
-                        .attr("text-anchor", "middle");
-                } else if (d.Country == "ARE") {
-                    svgChart.append("line")
-                        .attr("x1", xScale(i))
-                        .attr("y1", migrationScale(0))
-                        .attr("x2", xScale(i))
-                        .attr("y2", y2)
-                        .style("stroke", "#29BF12")
-                        .style("stroke-width", 25)
-                        .style("opacity", 0.75);
-
-                    svgChart.append("text")
-                        .text(country_id[d.Country].name)
-                        .attr("x", xScale(i) - 6)
-                        .attr("y", y2 - 10)
-                        .attr("font-size", "14px")
-                        .style("fill", "black")
-                        .attr("text-anchor", "middle");
-                } else {
-                    svgChart.append("line")
-                        .attr("x1", xScale(i))
-                        .attr("y1", migrationScale(0))
-                        .attr("x2", xScale(i))
-                        .attr("y2", y2)
-                        .style("stroke", "#29BF12")
-                        .style("stroke-width", 25)
-                        .style("opacity", 0.75);
-
-                    svgChart.append("text")
-                        .text(country_id[d.Country].name)
-                        .attr("x", xScale(i))
-                        .attr("y", y2 - 10)
-                        .attr("font-size", "14px")
-                        .style("fill", "black")
-                        .attr("text-anchor", "middle");
-                }
-                i += 1;
-            }
+        countryBank.sort(function(a, b) {
+            return parseFloat(a.NetMigration) - parseFloat(b.NetMigration);
         });
+
+
+
+        for (var i = 0; i <= countryBank[10].Values.length - 1;  i++) {
+            y2 = migrationScale(countryBank[10].Values[i]);
+            if (countryBank[10].Values[i]< 0) {
+                svgChart.append("line")
+                    .attr("x1", xScale(i))
+                    .attr("y1", migrationScale(0))
+                    .attr("x2", xScale(i))
+                    .attr("y2", y2)
+                    .style("stroke", "green")
+                    .style("stroke-width", 25)
+                    .style("opacity", 0.55);
+
+                svgChart.append("text")
+                    .text(countryBank[10].Years[i])
+                    .attr("x", xScale(i))
+                    .attr("y", y2 + 15)
+                    .attr("font-size", "14px")
+                    .style("fill", "black")
+                    .attr("text-anchor", "middle");
+            }else if (countryBank[10].Values[i]> 1) {
+                svgChart.append("line")
+                    .attr("x1", xScale(i))
+                    .attr("y1", migrationScale(0))
+                    .attr("x2", xScale(i))
+                    .attr("y2", y2)
+                    .style("stroke", "red")
+                    .style("stroke-width", 25)
+                    .style("opacity", 0.55);
+
+                svgChart.append("text")
+                    .text(countryBank[10].Years[i])
+                    .attr("x", xScale(i))
+                    .attr("y", y2 - 15)
+                    .attr("font-size", "14px")
+                    .style("fill", "black")
+                    .attr("text-anchor", "middle");
+            }
+        };
+
+        
         popAreaData = pop_area.countries;
 
         // ---------Infant Mortality vs Net Migration Scatter Log Plot---------------
