@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<meta charset="utf-8">
 <head>
 	<title>Project One</title>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
@@ -638,7 +639,7 @@
             .attr("alignment-baseline", "central");
 
         svgZoom.append("text")
-            .text("Lowest outgoing migration rate")
+            .text("Highest outgoing migration rate")
             .attr("x", 60)
             .attr("y", 773)
             .attr("font-size", "14px")
@@ -836,18 +837,33 @@
                 i += 1;
             }
         }
+        // function logTenFormat(n){
+        //   var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+        //   var neg = (n < 0) ? "-" : "";
+        //   n = Math.round(Math.abs(n));
+        //   if(n > 9) n = 9;
+        //   return neg + "10" + superscript[n];
+        // }
+        function logTenFormat(n){
+          n = n.toFixed(1)
+          var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹᛫";
+          var neg = (n < 0) ? "-" : "";
+          n = Math.abs(n);
+          var exp = ("" + n).split("").reduce((a, x) => a + superscript[x == "." ? 10 : x], "");
+          return neg + "10" + exp;
+        }
         var xScale_infant_migrate_log = d3.scaleLinear().domain(d3.extent(migration_log)).range([30, 750]);
-        var yScale_infant_migrate_log = d3.scaleLinear().domain([0, 1.6]).range([725, 15]);
-        var botAxis_infant_mitrate_log = d3.axisBottom(xScale_infant_migrate_log).ticks(20).tickSize(9);
-        var leftAxis_infant_mitrate_log = d3.axisLeft(yScale_infant_migrate_log).ticks(9).tickSize(9);
+        var yScale_infant_migrate_log = d3.scaleLinear().domain([0, 1.9]).range([725, 15]);
+        var botAxis_infant_migrate_log = d3.axisBottom(xScale_infant_migrate_log).ticks(10).tickFormat(logTenFormat).tickSize(9);
+        var leftAxis_infant_migrate_log = d3.axisLeft(yScale_infant_migrate_log).ticks(9).tickFormat(logTenFormat).tickSize(9);
 
-        var country_group_inf_mitrate_log = infantMort_netmigration_log_svg.selectAll('g')
+        var country_group_inf_migrate_log = infantMort_netmigration_log_svg.selectAll('g')
             .data(mideast)
             .enter()
             .append('g')
 
         // draw countries for actual data
-        country_group_inf_mitrate_log
+        country_group_inf_migrate_log
             .append('path')
             .attr('d', function(country) {
                 return pathGenerator2(country);
@@ -881,7 +897,7 @@
 
             });
         // add country name for actual
-        country_group_inf_mitrate_log
+        country_group_inf_migrate_log
             .append('text')
             .style("font-size", "10pt")
             .attr("transform", function(country, ind) {
@@ -927,7 +943,7 @@
             infant_log_projected[id] = infant_y;
         })
         // projected data
-        country_group_inf_mitrate_log
+        country_group_inf_migrate_log
             .append('path')
             .attr('d', function(country) {
                 return pathGenerator2(country);
@@ -956,7 +972,7 @@
 
             });
         // add country name
-        country_group_inf_mitrate_log
+        country_group_inf_migrate_log
             .append('text')
             .style("font-size", "10pt")
             .attr("transform", function(country, ind) {
@@ -977,43 +993,41 @@
                 return id_to_country['' + country.id];
             });
 
+        //function to display proper axeses
+        
+
         // add axeses
-        var inf_mitrate_plot = infantMort_netmigration_log_svg.append("g");
-        inf_mitrate_plot.append("g").style("font", "15px times")
-            .call(botAxis_infant_mitrate_log).attr("transform", "translate(0,725)");
-        inf_mitrate_plot.append("g").style("font", "15px times")
-            .call(leftAxis_infant_mitrate_log).attr("transform", "translate(400,0)");
-        inf_mitrate_plot
+        var inf_migrate_plot = infantMort_netmigration_log_svg.append("g");
+        inf_migrate_plot.append("g").style("font", "15px times")
+            .call(botAxis_infant_migrate_log).attr("transform", "translate(0,725)");
+        inf_migrate_plot.append("g").style("font", "15px times")
+            .call(leftAxis_infant_migrate_log).attr("transform", "translate(400,0)");
+        inf_migrate_plot
             .append("text")
             .style("font-size", "14pt")
             .attr("x", "-550")
-            .attr("y", "355")
+            .attr("y", "420")
             .attr("font-weight", "bold")
             .attr("transform", "rotate(-90)")
-            .text("Log_10 Infant Mortality")
-        inf_mitrate_plot
+            .text("Infant Mortality per 1000 births")
+       
+        inf_migrate_plot
             .append("text")
-            .style("font-size", "14pt")
-            .attr("x", "50")
-            .attr("y", "700")
+            .style("font-size", "15pt")
+            .attr("x", "30")
+            .attr("y", "70")
             .attr("font-weight", "bold")
-            .text("Log_10 # of People Leaving")
-        inf_mitrate_plot
+            .text("Logarithmic Perspective")
+        inf_migrate_plot
             .append("text")
             .style("font-size", "15pt")
             .attr("x", "330")
             .attr("y", "770")
             .attr("font-weight", "bold")
-            .text("Logarithmic Perspective")
-        inf_mitrate_plot
-            .append("text")
-            .style("font-size", "14pt")
-            .attr("x", "550")
-            .attr("y", "700")
-            .attr("font-weight", "bold")
-            .text("Log_10 # of People Entering")
+            .text("Net Migrants")
+        
 
-        inf_mitrate_plot.append("rect")
+        inf_migrate_plot.append("rect")
             .attr("x", 50)
             .attr("y", 580)
             .attr("width", 30)
@@ -1021,7 +1035,7 @@
             .style("opacity", ".3")
             .style("fill", "purple");
 
-        inf_mitrate_plot.append("text")
+        inf_migrate_plot.append("text")
             .text("Projected during 2010 for 2015")
             .attr("x", 90)
             .attr("y", 592)
@@ -1030,7 +1044,7 @@
             .attr("font-weight", "bold")
             .attr("alignment-baseline", "central");
 
-        inf_mitrate_plot.append("rect")
+        inf_migrate_plot.append("rect")
             .attr("x", 50)
             .attr("y", 620)
             .attr("width", 30)
@@ -1038,7 +1052,7 @@
             .style("opacity", "1")
             .style("fill", "orange");
 
-        inf_mitrate_plot.append("text")
+        inf_migrate_plot.append("text")
             .text("Actual Data from 2012")
             .attr("x", 90)
             .attr("y", 632)
@@ -1046,15 +1060,16 @@
             .style("fill", "black")
             .attr("font-weight", "bold")
             .attr("alignment-baseline", "central");
-        inf_mitrate_plot.append("circle")
+        // circle highlighting Syria on Actual Data
+        inf_migrate_plot.append("circle")
             .attr("cx", 30)
-            .attr("cy", 240)
+            .attr("cy", 410)
             .attr("r", 25)
             .attr("fill", "none")
             .style("stroke", "black")
-        inf_mitrate_plot.append("circle")
+        inf_migrate_plot.append("circle")
             .attr("cx", 540)
-            .attr("cy", 215)
+            .attr("cy", 285)
             .attr("r", 25)
             .attr("fill", "none")
             .style("stroke", "black")
@@ -1063,17 +1078,17 @@
 
         //---------- Infant Mortality vs Net Migration Scatter Linear Plot---------------
         var xScale_infant_migrate = d3.scaleLinear().domain([-4120000, 2060000]).range([30, 750]);
-        var yScale_infant_migrate = d3.scaleLinear().domain([0, 54]).range([725, 15]);
-        var botAxis_infant_mitrate = d3.axisBottom(xScale_infant_migrate).ticks(8).tickSize(9);
-        var leftAxis_infant_mitrate = d3.axisLeft(yScale_infant_migrate).ticks(5).tickSize(9);
+        var yScale_infant_migrate = d3.scaleLinear().domain([0, 64]).range([725, 15]);
+        var botAxis_infant_migrate = d3.axisBottom(xScale_infant_migrate).ticks(8).tickSize(9);
+        var leftAxis_infant_migrate = d3.axisLeft(yScale_infant_migrate).ticks(5).tickSize(9);
 
-        var country_group_inf_mitrate = infantMort_netmigration_svg.selectAll('g')
+        var country_group_inf_migrate = infantMort_netmigration_svg.selectAll('g')
             .data(mideast)
             .enter()
             .append('g')
 
         //actual data
-        country_group_inf_mitrate
+        country_group_inf_migrate
             .append('path')
             .attr('d', function(country) {
                 return pathGenerator2(country);
@@ -1104,7 +1119,7 @@
                     migrate_x + "," + infant_y + ")  scale(" + small_scale_country_id[country.id] + ") ";
             });
         // add country name for actual
-        country_group_inf_mitrate
+        country_group_inf_migrate
             .append('text')
             .style("font-size", "10pt")
             .attr("transform", function(country, ind) {
@@ -1125,7 +1140,7 @@
                 return id_to_country['' + country.id];
             });
         // projected data
-        country_group_inf_mitrate
+        country_group_inf_migrate
             .append('path')
             .attr('d', function(country) {
                 console.log(country.id)
@@ -1158,7 +1173,7 @@
 
             });
         // add country name
-        country_group_inf_mitrate
+        country_group_inf_migrate
             .append('text')
             .style("font-size", "10pt")
             .attr("transform", function(country, ind) {
@@ -1177,79 +1192,73 @@
                 return id_to_country['' + country.id];
             });
         // add axeses
-        var inf_mitrate_plot = infantMort_netmigration_svg.append("g");
-        inf_mitrate_plot.append("g").style("font", "15px times")
-            .call(botAxis_infant_mitrate).attr("transform", "translate(0,725)");
-        inf_mitrate_plot.append("g").style("font", "15px times")
-            .call(leftAxis_infant_mitrate).attr("transform", "translate(512,0)");
-        inf_mitrate_plot
+        var inf_migrate_plot = infantMort_netmigration_svg.append("g");
+        inf_migrate_plot.append("g").style("font", "15px times")
+            .call(botAxis_infant_migrate).attr("transform", "translate(0,725)");
+        inf_migrate_plot.append("g").style("font", "15px times")
+            .call(leftAxis_infant_migrate).attr("transform", "translate(512,0)");
+        inf_migrate_plot
             .append("text")
             .style("font-size", "14pt")
             .attr("x", "-500")
             .attr("y", "455")
             .attr("font-weight", "bold")
             .attr("transform", "rotate(-90)")
-            .text("Infant Mortality")
-        inf_mitrate_plot
-            .append("text")
-            .style("font-size", "14pt")
-            .attr("x", "50")
-            .attr("y", "700")
-            .attr("font-weight", "bold")
-            .text("# of People Leaving")
-        inf_mitrate_plot
-            .append("text")
-            .style("font-size", "14pt")
-            .attr("x", "630")
-            .attr("y", "700")
-            .attr("font-weight", "bold")
-            .text("# of People Entering")
-        inf_mitrate_plot.append("rect")
+            .text("Infant Mortality per 1000 births")
+        
+        inf_migrate_plot.append("rect")
             .attr("x", 50)
-            .attr("y", 580)
+            .attr("y", 520)
             .attr("width", 30)
             .attr("height", 25)
             .style("opacity", ".3")
             .style("fill", "purple");
-        inf_mitrate_plot.append("text")
+        inf_migrate_plot.append("text")
             .text("Projected during 2010 for 2015")
             .attr("x", 90)
-            .attr("y", 592)
+            .attr("y", 532)
             .attr("font-size", "20px")
             .style("fill", "black")
             .attr("font-weight", "bold")
             .attr("alignment-baseline", "central");
-        inf_mitrate_plot.append("rect")
+        inf_migrate_plot.append("rect")
             .attr("x", 50)
-            .attr("y", 620)
+            .attr("y", 560)
             .attr("width", 30)
             .attr("height", 25)
             .style("opacity", "1")
             .style("fill", "orange");
-        inf_mitrate_plot.append("text")
+        inf_migrate_plot.append("text")
             .text("Actual Data from 2012")
             .attr("x", 90)
-            .attr("y", 632)
+            .attr("y", 572)
             .attr("font-size", "20px")
             .style("fill", "black")
             .attr("font-weight", "bold")
             .attr("alignment-baseline", "central");
-        inf_mitrate_plot
+        inf_migrate_plot
+            .append("text")
+            .style("font-size", "15pt")
+            .attr("x", "80")
+            .attr("y", "70")
+            .attr("font-weight", "bold")
+            .text("Linear Perspective")
+        inf_migrate_plot
             .append("text")
             .style("font-size", "15pt")
             .attr("x", "430")
             .attr("y", "770")
             .attr("font-weight", "bold")
-            .text("Linear Perspective")
-        inf_mitrate_plot.append("circle")
+            .text("Net Migrants")
+        inf_migrate_plot.append("circle")
             .attr("cx", 40)
-            .attr("cy", 560)
+            .attr("cy", 650)
             .attr("r", 25)
             .attr("fill", "none")
             .style("stroke", "black")
-        inf_mitrate_plot.append("circle")
+        inf_migrate_plot.append("circle")
             .attr("cx", 510)
-            .attr("cy", 540)
+            .attr("cy", 570)
             .attr("r", 25)
             .attr("fill", "none")
             .style("stroke", "black")
