@@ -316,7 +316,7 @@
         "634": "Qatar",
         "682": "Saudi Arabia",
         "760": "Syria",
-        "784": "United Arab Emirates",
+        "784": "UAE",
         "792": "Turkey",
         "887": "Yemen",
     }
@@ -754,6 +754,7 @@
         migration_log = [];
         id_to_ind.forEach(function(id) {
             country_name = id_to_country[id]
+
             country_index = find_countryBank_index(country_name)
             migration = Number(countryBank[country_index].NetMigration)
             abs_migration = Math.abs(migration)
@@ -803,6 +804,8 @@
                 country_name = "Syrian Arab Republic";
             } else if (country_name == "Yemen") {
                 country_name = "Yemen, Rep.";
+            } else if (country_name == "UAE") {
+                country_name = "United Arab Emirates";
             }
 
             i = 0;
@@ -826,6 +829,8 @@
                 country_name = "Syrian Arab Republic";
             } else if (country_name == "Yemen") {
                 country_name = "Yemen, Rep.";
+            } else if (country_name == "UAE") {
+                country_name = "United Arab Emirates";
             }
 
             i = 0;
