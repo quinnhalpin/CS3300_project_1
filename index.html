@@ -47,28 +47,34 @@
     h2 {
       margin: 1em;
     }
+    h3 {
+        width: 800px;
+    }
 
     #intro {
-      height: 70vh;
+      height: 50vh;
     }
     #p_scatter{
         /*-webkit-flex-direction: row;  works with row or column */
        /*flex-direction: row;*/
         /*width: 1600px;*/
     }
+
     
 </style>
 <body>
     <section id="intro">
         <h1>Migration in the Middle East: Prediction vs Actual</h1>
-        <h3>By Sofie Cornelis, Quinn Halpin, and Weston Forster</h3>
-        <p>In 2010, UN projected the net migration of all the middle eastern countries for 2015. However things did not turn out as they expect. This project explores the predicted and actual data.</p>
+        <h2>By Sofie Cornelis, Quinn Halpin, and Weston Forster</h3>
+    </section>
+    <section id="p_explaination">
+        <h3>In 2010, UN projected the 2015 net migration of Middle Eastern countries. However things did not turn out as they expect. This project explores the predicted and actual data.</h3>
     </section>
     <section id="p1">
         <h2>Actual Net Migration recorded in the Middle East in 2012</h2>
     </section>
     <section id="p2">
-        <p>While this was how people actually moved throughout the Middle East the below compares the real data to the predicted data. While the UN is usually accurate about their predictions, they were far from correct.</p>
+        <h3>While this was how people actually moved throughout the Middle East the below compares the real data to the predicted data. While the UN is usually accurate about their predictions, they were far from correct.</h3>
         <h2>UN Predicted Net Migration for the Middle East</h2>
     </section>
     <section id="p2_actual">
@@ -76,18 +82,11 @@
     </section>
 
     <section id="p_scatter">
-        <h2>UN's 2010's projected Infant Mortality vs Net Migration for 2015 compared to 2012 data</h2>
-        <p>
-            Top Figure: Log base 10 scale view of both axes
-            <br> Bottom Figure: Linear scale on both axes
-        </p>
+        <h2>UN's Projected Net Migration vs the Actual Recorded Net Migration</h2>
+        <h3>
+            In April of 2011, 5000 Refugees fleed harsh fighting in Talkalakh, Syria, sparking the Syrian Refugee Crisis. In June of 2011, the military seige of Jisr al-Shughour sparks a major flow of refugees into Turkey. By the end of 2011, Turkey had spent $15 million to set up six camps for thousands of Syrian refugees. Between
+        </h3>
         <div id="p_scatter"></div>
-    </section>
-    <section id="p_explaination">
-        <p>
-            In April of 2011, 5000 Refugees fleed harsh fighting in Talkalakh, Syria, sparking the Syrian Refugee Crisis. In June of 2011, the military seige of Jisr al-Shughour sparks a major flow of refugees into Turkey. By the end of 2011, Turkey had spent $15 million to set up six camps for thousands of Syrian refugees.
-
-        </p>
     </section>
     <script type="text/javascript">
     var dataset, nestedData, rawData, countries, popAreaData, nestBankData, countryBank;
