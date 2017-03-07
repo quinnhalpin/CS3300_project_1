@@ -60,7 +60,7 @@
         <p>In 2010, UN projected the net migration of all the middle eastern countries for 2015. However things did not turn out as they expect. This project explores the predicted and actual data.</p>
     </section>
     <section id="p1">
-        <h2>Title For Maps here</h2>
+        <h2>Globabl View of Net Migration in 2012</h2>
         <p>Description if desired</p>
     </section>
     <section id="p2">
@@ -70,10 +70,9 @@
         <h2>Actual Migration recorded in the Middle East</h2>
     </section>
     <section id="p_scatter">
-        <h2>Title For Scatter Plot here</h2>
+        <h2>UN's 2010's projected Infant Mortality vs Net Migration for 2015 compared to 2012 data</h2>
         <p>
-            UN's 2010's projected Infant Mortality vs Net Migration Rate projected for 2015 compared to actual 2012 data.
-            <br> Top Figure: Log base 10 scale view of both axes
+            Top Figure: Log base 10 scale view of both axes
             <br> Bottom Figure: Linear scale on both axes
         </p>
     </section>
@@ -1063,7 +1062,7 @@
         id_to_ind.forEach(function(id) {
             country_name = id_to_country[id]
             country_index = find_country_index(id)
-            migration = Number(countryData[country_index].NetMigration)
+            migration = Number(countryData[country_index].NetMigration)* 1000;
             console.log(migration)
             abs_migration = Math.abs(migration)
             migrate_x = Math.log10(abs_migration)
@@ -1211,8 +1210,8 @@
             .attr("fill", "none")
             .style("stroke", "black")
         inf_migrate_plot.append("circle")
-            .attr("cx", 540)
-            .attr("cy", 285)
+            .attr("cx", 700)
+            .attr("cy", 295)
             .attr("r", 25)
             .attr("fill", "none")
             .style("stroke", "black")
@@ -1302,9 +1301,12 @@
                 console.log(countryData[country_index])
                 if (countryData[country_index] != undefined) {
                     infant_y = yScale_infant_migrate(Number(countryData[country_index].InfantMort))
-                    migrate_x = xScale_infant_migrate(Number(countryData[country_index].NetMigration))
+                    console.log("before")
+                    console.log( Number(countryData[country_index].NetMigration))
+                    migrants_projected = Number(countryData[country_index].NetMigration) *1000;
+                    migrate_x = xScale_infant_migrate(migrants_projected); 
                     console.log("migrates")
-                    console.log(migrate_x)
+                    console.log(migrants_projected)
                 } else {
                     console.log("cannot find")
                     console.log(country_index)
@@ -1323,7 +1325,8 @@
                 country_index = find_country_index(country.id)
                 if (countryData[country_index] != undefined) {
                     infant_y_text = yScale_infant_migrate(Number(countryData[country_index].InfantMort));
-                    migrate_x_text = xScale_infant_migrate(Number(countryData[country_index].NetMigration)) - 10;
+                    migrants_projected = Number(countryData[country_index].NetMigration) * 1000;
+                    migrate_x_text = xScale_infant_migrate(migrants_projected) - 10;
                 } else {
                     infant_x_text = 0;
                     migrate_y_text = 0;
@@ -1400,7 +1403,7 @@
             .attr("fill", "none")
             .style("stroke", "black")
         inf_migrate_plot.append("circle")
-            .attr("cx", 510)
+            .attr("cx", 540)
             .attr("cy", 570)
             .attr("r", 25)
             .attr("fill", "none")
