@@ -24,7 +24,7 @@
     }
   /*h1 {font-family: 'Ubuntu', sans-serif;}  */
     
-    section {
+    section, div {
       font-family: 'Fauna One';
       display: -webkit-flex;
         display: flex;
@@ -51,6 +51,11 @@
     #intro {
       height: 70vh;
     }
+    #p_scatter{
+        -webkit-flex-direction: row; /* works with row or column */
+       flex-direction: row;
+        width: 1600px;
+    }
     
 </style>
 <body>
@@ -69,13 +74,14 @@
     <section id="p2_actual">
         <h2>Actual Migration recorded in the Middle East</h2>
     </section>
-    <section id="p_scatter">
+    <section>
         <h2>Title For Scatter Plot here</h2>
         <p>
             UN's 2010's projected Infant Mortality vs Net Migration Rate projected for 2015 compared to actual 2012 data.
             <br> Top Figure: Log base 10 scale view of both axes
             <br> Bottom Figure: Linear scale on both axes
         </p>
+        <div id="p_scatter"></div>
     </section>
     <section id="p_explaination">
         <p>
@@ -537,6 +543,98 @@
             .attr("y2", 800)
             .style("stroke", "black")
             .style("stroke-width", 1);
+
+        //Add key for the Maps
+        //gradient color scale
+        var linearGradient = svgZoom.append("linearGradient")
+            .attr("id", "linear-gradient");
+
+        linearGradient
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "0%")
+            .attr("y2", "100%");
+
+        svgMap.append("rect")
+            .attr("x", 500)
+            .attr("y", 640)
+            .attr("width", 20)
+            .attr("height", 150)
+            .style("fill", "url(#linear-gradient)");
+
+
+        linearGradient.selectAll("stop")
+            .data([{
+                    offset: "0%",
+                    color: "#E21223"
+                },
+                {
+                    offset: "12.5%",
+                    color: "#F71629"
+                },
+                {
+                    offset: "25%",
+                    color: "#FF3535"
+                },
+                {
+                    offset: "37.5%",
+                    color: "#F75B60"
+                },
+                {
+                    offset: "50%",
+                    color: "#fff"
+                },
+                {
+                    offset: "75%",
+                    color: "#ABFF4F"
+                },
+                {
+                    offset: "97%",
+                    color: "#29BF12"
+                },
+                {
+                    offset: "100%",
+                    color: "#092B03"
+                }
+            ])
+            .enter().append("stop")
+            .attr("offset", function(d) {
+                return d.offset;
+            })
+            .attr("stop-color", function(d) {
+                return d.color;
+            });
+
+        svgMap.append("text")
+            .text("Most incoming migration rate")
+            .attr("x", 530)
+            .attr("y", 645)
+            .attr("font-size", "14px")
+            .style("fill", "black")
+            .attr("alignment-baseline", "central");
+
+        svgMap.append("text")
+            .text("Most outgoing migration rate")
+            .attr("x", 530)
+            .attr("y", 783)
+            .attr("font-size", "14px")
+            .style("fill", "black")
+            .attr("alignment-baseline", "central");
+
+        svgMap.append("rect")
+            .attr("x", 500)
+            .attr("y", 610)
+            .attr("width", 20)
+            .attr("height", 10)
+            .style("fill", "#FFAE19");
+
+        svgMap.append("text")
+            .text("Countries banned by Trump")
+            .attr("x", 530)
+            .attr("y", 615)
+            .attr("font-size", "14px")
+            .style("fill", "black")
+            .attr("alignment-baseline", "central");
 
         //----------------Create the zoomed in map----------------
         var paths = svgZoom.selectAll("path.country").data(countries.features);
