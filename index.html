@@ -11,40 +11,41 @@
 
 <style>
     svg { 
-    font-family: 'Lato', sans-serif; 
-    border: solid #ccc 1px;
-    background-color: #ffffff; 
+        font-family: 'Lato', sans-serif; 
+        border: solid #ccc 1px;
+        background-color: #ffffff; 
     }
     body { background-color: #ffffff;}
     p {
-      font-family: 'Ubuntu', sans-serif;
-      max-width: 800px; 
-      color: black; 
-      font-size:14pt;
+        font-family: 'Ubuntu', sans-serif;
+        max-width: 800px; 
+        color: black; 
+        font-size:14pt;
     }
     section, div {
-      font-family: 'Fauna One';
-      display: -webkit-flex;
+        font-family: 'Lato';
+        display: -webkit-flex;
         display: flex;
         display: -webkit-flex;
-       display: flex;
-       -webkit-flex-direction: column; 
-       flex-direction: column;
-       -webkit-align-items: center;
-       align-items: center;
-       -webkit-justify-content: center;
-       justify-content: center;
-       margin-bottom: 4vh;
+        display: flex;
+        -webkit-flex-direction: column; 
+        flex-direction: column;
+        -webkit-align-items: center;
+        align-items: center;
+        -webkit-justify-content: center;
+        justify-content: center;
     }
-
+    section {
+        margin: 5em auto;
+    }
     h1 {
         font-family: 'Playfair Display';
         font-size: 3em;
     }
-
     h2 {
+        font-family: 'Playfair Display';
         font-size: 2em;
-        margin: 1em;
+        margin: .25em;
     }
     .descriptions{
         font-family: 'Lato';
@@ -52,37 +53,46 @@
     }
 
     #intro {
-      height: 50vh;
+        height: 630px;
     }
-    section #explaination {
+
+    #byline {
         font-family: 'Lato';
-        font-size: 3em;
-        width: 3000px;
+        font-size: 1.75em;
+        margin: 0 1em 1em 1em;
+        opacity: .50;
+    }
+
+    #explaination {
+        font-family: 'Lato';
+        font-size: 2.8em;
+        width: 1000px;
+        text-align: justify;
     }
 
     
 </style>
 <body>
     <section id="intro">
-        <h1>Migration in the Middle East: Prediction vs Observed</h1>
-        <h2>By Sofie Cornelis, Quinn Halpin, and Weston Forster</h3>
-    </section>
-    <section>
-        <p id="explaination">In 2010, the United Nations projected the 2015 net migration of Middle Eastern countries. However things did not turn out as they expected. This visualization explores the predicted and observed data...</p>
+        <h1>Migration in the Middle East: Prediction vs. Observed</h1>
+        <h2 id="byline">By Sofie Cornelis, Quinn Halpin, and Weston Forster</h2>
+        <h1 id="explaination">In 2010, the United Nations projected the 2015 net migration of Middle Eastern countries. However things did not turn out as they expected. This visualization explores the predicted and observed data...</h1>
     </section>
     <section id="maps">
         <h2>Observed Net Migration recorded in the Middle East in 2012</h2>
-    </section>
-    <section id="predicted_barchart">
+        <div id="maps_svg"></div>
         <p class="descriptions">
         Note, the arrow represents the highest gradient of migration occured between Syria and Turkey in 2012.
         These maps show how people actually moved throughout the Middle East. The below charts compare the observed migration to the predicted data. The U.N. has a reputation for accurate predictions, but in this case they were far from correct.</p>
-        
-        <h2>UN Predicted Net Migration for the Middle East</h2>
     </section>
-    <section id="actual_barchart">
+    <section id="barcharts">
+        <h2>UN Predicted Net Migration for the Middle East</h2>
+        <div id="predicted_barchart_svg"></div>
+        
         <p class="descriptions">Comparing these two charts, it is important to note the magnitude difference. The observed migration values are more than an order of magnitude larger than projected values. Furthermore, several of the countries changed from having a projected negative migration, to a positive observed migration. The countries that experienced the largest changes in projection vs. observed are Syria and it's neighbors.</p>
-        <h2>Observed Net Migration recorded in the Middle East</h2>
+
+         <h2>Observed Net Migration recorded in the Middle East</h2>
+        <div id="actual_barchart_svg"></div>
     </section>
 
     <section id="scatter">
@@ -90,6 +100,7 @@
         <p class="descriptions">
             In April of 2011, 5000 Refugees fled harsh fighting in Talkalakh, Syria, sparking the Syrian Refugee Crisis. In June of 2011, the military seige of Jisr al-Shughour sparked a major flow of refugees into Turkey. By the end of 2011, Turkey had spent $15 million to set up six camps for thousands of Syrian refugees. Between 2011 and the present, millions of refugees have left Syria. The overwhelming majority of these refugees remain in the middle east.
         </p>
+        <div id="scatter_svg"></div>
     </section>
     <script type="text/javascript">
     var dataset, nested_data, raw_data, countries, nest_bank_data, country_bank;
@@ -99,14 +110,14 @@
     var projection3 = d3.geoMercator().scale(300);
     var path_generator = d3.geoPath().projection(projection);
     //create svgs
-    var svg_map = d3.select("#maps").append("svg").attr("width", 800).attr("height", 800)
+    var svg_map = d3.select("#maps_svg").append("svg").attr("width", 800).attr("height", 800)
         .style("background", "#E2FCFF"); //makes the svg map background light blue;
-    var svg_zoom = d3.select("#maps").append("svg").attr("width", 800).attr("height", 800)
+    var svg_zoom = d3.select("#maps_svg").append("svg").attr("width", 800).attr("height", 800)
         .style("background", "#E2FCFF"); //makes the svg map background light blue;
 
-    var svg_chart = d3.select("#predicted_barchart").append("svg").attr("width", 1200).attr("height", 600).style("background", "#FCFEFF");
-    var svg_chart_actual = d3.select("#actual_barchart").append("svg").attr("width", 1200).attr("height", 900).style("background", "#FCFEFF");
-    var net_migration_svg = d3.select("#scatter").append("svg").attr("width", 1400).attr("height", 800)
+    var svg_chart = d3.select("#predicted_barchart_svg").append("svg").attr("width", 1200).attr("height", 600).style("background", "#FCFEFF");
+    var svg_chart_actual = d3.select("#actual_barchart_svg").append("svg").attr("width", 1200).attr("height", 900).style("background", "#FCFEFF");
+    var net_migration_svg = d3.select("#scatter_svg").append("svg").attr("width", 1400).attr("height", 800)
         .style("background", "#FCFEFF");
 
     d3.queue()
