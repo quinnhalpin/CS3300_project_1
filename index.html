@@ -54,11 +54,6 @@
     #intro {
       height: 50vh;
     }
-    #p_scatter{
-        /*-webkit-flex-direction: row;  works with row or column */
-       /*flex-direction: row;*/
-        /*width: 1600px;*/
-    }
 
     
 </style>
@@ -67,28 +62,27 @@
         <h1>Migration in the Middle East: Prediction vs Actual</h1>
         <h2>By Sofie Cornelis, Quinn Halpin, and Weston Forster</h3>
     </section>
-    <section id="p_explaination">
+    <section id="explaination">
         <h3>In 2010, UN projected the 2015 net migration of Middle Eastern countries. However things did not turn out as they expect. This project explores the predicted and actual data.</h3>
     </section>
-    <section id="p1">
+    <section id="maps">
         <h2>Actual Net Migration recorded in the Middle East in 2012</h2>
     </section>
-    <section id="p2">
+    <section id="predicted_barchart">
         <h3>While this was how people actually moved throughout the Middle East the below compares the real data to the predicted data. While the UN is usually accurate about their predictions, they were far from correct.</h3>
         
         <h2>UN Predicted Net Migration for the Middle East</h2>
     </section>
-    <section id="p2_actual">
+    <section id="actual_barchart">
         <p>WES WIRTE ABOUT CHARTS HERE</p>
         <h2>Actual Net Migration recorded in the Middle East</h2>
     </section>
 
-    <section id="p_scatter">
+    <section id="scatter">
         <h2>UN's Projected Net Migration vs the Actual Recorded Net Migration</h2>
         <h3>
             In April of 2011, 5000 Refugees fleed harsh fighting in Talkalakh, Syria, sparking the Syrian Refugee Crisis. In June of 2011, the military seige of Jisr al-Shughour sparks a major flow of refugees into Turkey. By the end of 2011, Turkey had spent $15 million to set up six camps for thousands of Syrian refugees. Between
         </h3>
-        <div id="p_scatter"></div>
     </section>
     <script type="text/javascript">
     var dataset, nestedData, rawData, countries, popAreaData, nestBankData, countryBank;
@@ -97,13 +91,13 @@
     var projection_out = d3.geoMercator().scale(300);
     var projection3 = d3.geoMercator().scale(300);
     var pathGenerator = d3.geoPath().projection(projection);
-    var svgMap = d3.select("#p1").append("svg").attr("width", 800).attr("height", 800)
+    var svgMap = d3.select("#maps").append("svg").attr("width", 800).attr("height", 800)
         .style("background", "#E2FCFF"); //makes the svg map background light blue;
-    var svgZoom = d3.select("#p1").append("svg").attr("width", 800).attr("height", 800)
+    var svgZoom = d3.select("#maps").append("svg").attr("width", 800).attr("height", 800)
         .style("background", "#E2FCFF"); //makes the svg map background light blue;
-    var svgChart = d3.select("#p2").append("svg").attr("width", 1200).attr("height", 550).style("background", "#FCFEFF");
-    var svgChartActual = d3.select("#p2_actual").append("svg").attr("width", 1200).attr("height", 900).style("background", "#FCFEFF");
-    var netmigration_svg = d3.select("#p_scatter").append("svg").attr("width", 1400).attr("height", 800)
+    var svgChart = d3.select("#predicted_barchart").append("svg").attr("width", 1200).attr("height", 550).style("background", "#FCFEFF");
+    var svgChartActual = d3.select("#actual_barchart").append("svg").attr("width", 1200).attr("height", 900).style("background", "#FCFEFF");
+    var netmigration_svg = d3.select("#scatter").append("svg").attr("width", 1400).attr("height", 800)
         .style("background", "#FCFEFF");
 
     d3.queue()
