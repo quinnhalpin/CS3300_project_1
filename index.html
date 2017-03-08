@@ -85,45 +85,27 @@
         </h3>
     </section>
     <script type="text/javascript">
-    var dataset, nestedData, rawData, countries, popAreaData, nestBankData, countryBank;
+    var dataset, nested_data, raw_data, countries, nest_bank_data, country_bank;
     var migration_log;
     var projection = d3.geoMercator().scale(125);
     var projection_out = d3.geoMercator().scale(300);
     var projection3 = d3.geoMercator().scale(300);
-    var pathGenerator = d3.geoPath().projection(projection);
-    var svgMap = d3.select("#maps").append("svg").attr("width", 800).attr("height", 800)
+    var path_generator = d3.geoPath().projection(projection);
+    var svg_map = d3.select("#maps").append("svg").attr("width", 800).attr("height", 800)
         .style("background", "#E2FCFF"); //makes the svg map background light blue;
-    var svgZoom = d3.select("#maps").append("svg").attr("width", 800).attr("height", 800)
+    var svg_zoom = d3.select("#maps").append("svg").attr("width", 800).attr("height", 800)
         .style("background", "#E2FCFF"); //makes the svg map background light blue;
-    var svgChart = d3.select("#predicted_barchart").append("svg").attr("width", 1200).attr("height", 550).style("background", "#FCFEFF");
-    var svgChartActual = d3.select("#actual_barchart").append("svg").attr("width", 1200).attr("height", 900).style("background", "#FCFEFF");
-    var netmigration_svg = d3.select("#scatter").append("svg").attr("width", 1400).attr("height", 800)
+    var svg_chart = d3.select("#predicted_barchart").append("svg").attr("width", 1200).attr("height", 550).style("background", "#FCFEFF");
+    var svg_chart_actual = d3.select("#actual_barchart").append("svg").attr("width", 1200).attr("height", 900).style("background", "#FCFEFF");
+    var net_migration_svg = d3.select("#scatter").append("svg").attr("width", 1400).attr("height", 800)
         .style("background", "#FCFEFF");
 
     d3.queue()
         .defer(d3.csv, "large-tabular.csv")
         .defer(d3.csv, "net_migration_mideast.csv")
         .defer(d3.json, "world-50m.json")
-        .defer(d3.json, "middle_east_pop_area.json")
         .await(done_function);
-    scale_country_id = {
-        48: 7,
-        818: .4,
-        364: .2,
-        368: .4,
-        376: 1,
-        400: .8,
-        414: 1.3,
-        422: 1.5,
-        512: .4,
-        275: 2,
-        634: 2,
-        682: .2,
-        760: .7,
-        792: .4,
-        784: 1,
-        887: .5
-    }
+
     small_scale_country_id = {
         48: 7,
         818: .2,
@@ -289,55 +271,55 @@
     }
     id_to_ind = [48, 818, 364, 368, 376, 400, 414, 422, 512, 634, 682, 760, 784, 792, 887];
 
-    /* This function returns an array countryData containing an object for each country with fields of the 2015 data for each variable*/
+    /* This function returns an array country_data containing an object for each country with fields of the 2015 data for each variable*/
 
-    function done_function(error, csv_data, bank_csv, world_json_data, pop_area) {
+    function done_function(error, csv_data, bank_csv, world_json_data) {
         dataset = csv_data;
-        bankdata = bank_csv;
-        nestedData = d3.nest()
+        bank_data = bank_csv;
+        nested_data = d3.nest()
             .key(function(d) {
                 return d.REF_AREA;
             })
             .entries(csv_data);
-        nestBankData = d3.nest()
+        nest_bank_data = d3.nest()
             .key(function(d) {
                 return d.Country_Name;
             })
             .entries(bank_csv);
         
-        // Country bank has all values for netMigration stored with index 0 being 1960 and index 57 being 2016. Most values are empty strings but all are defined.
-        countryBank = nestBankData.map(function(country) {
-            var bankResult = {
+        // Country bank has all values for net_Migration stored with index 0 being 1960 and index 57 being 2016. Most values are empty strings but all are defined.
+        country_bank = nest_bank_data.map(function(country) {
+            var bank_result = {
                 Country: country.key
             };
             yearValue = Object(country.values[0]);
             var keys = Object.keys(yearValue).slice(0, 57);
             var values = Object.values(yearValue).slice(0, 57);
-            bankResult.Years = keys;
-            bankResult.Values = values;
-            // Returns the 2012 value for NetMigration
-            bankResult.NetMigration = values[52];
+            bank_result.Years = keys;
+            bank_result.Values = values;
+            // Returns the 2012 value for Net_Migration
+            bank_result.Net_Migration = values[52];
             //threeCode is the Three digit country code
-            bankResult.ThreeCode = country.values[0].Country_Code;
-            return bankResult;
+            bank_result.ThreeCode = country.values[0].Country_Code;
+            return bank_result;
         });
         
-        countryData = nestedData.map(function(country) {
+        country_data = nested_data.map(function(country) {
             var result = {
                 Country: country.key
             };
             country.values.forEach(function(d) {
                 if (d.TIME_PERIOD == "2015") {
                     if (d.INDICATOR == "SM_POP_NETM") {
-                        result.NetMigration = d.OBS_VALUE;
+                        result.Net_Migration = d.OBS_VALUE;
                     } else if (d.INDICATOR == "SM_POP_NMRT") {
-                        result.NetMigRate = d.OBS_VALUE;
+                        result.Net_Mig_Rate = d.OBS_VALUE;
                     } else if (d.INDICATOR == "SP_POP_CHGE") {
                         result.PopChange = d.OBS_VALUE;
                     } else if (d.INDICATOR == "SP_POP_TOTL") {
                         result.PopTotal = d.OBS_VALUE;
                     } else if (d.INDICATOR == "SP_DYN_LE00") {
-                        result.LifeExpect = d.OBS_VALUE;
+                        result.Life_Expect = d.OBS_VALUE;
                     } else if (d.INDICATOR == "SH_DYN_IMRT") {
                         result.InfantMort = d.OBS_VALUE;
                     } else if (d.INDICATOR == "ID") {
@@ -348,56 +330,55 @@
             return result;
         });
         //Remove the underfined element in the array
-        countryData = countryData.filter(function(c) {
+        country_data = country_data.filter(function(c) {
             return c.Country !== "undefined";
         });
 
-        var scaleOrdinal = d3.scaleOrdinal(d3.schemeCategory20c);
-        var redGreen = [
+        var red_green = [
             /*reds dark to light:*/
             "#E21223", "#F71629", "#FF3535", "#F75B60", "#fff", //red leaves
             /*green light to dark:*/
             "#ABFF4F", "#29BF12"
         ]; //green stay
-        var grayColors = ['#d3d3d3', '#d3d3d3'];
-        var colorScaleMap = d3.scaleLinear().domain([-17, -50000, -6000, -300, 0, 655555.5, 2000003]).range(redGreen);
-        var grayScale = d3.scaleLinear().domain([0, 100]).range(grayColors);
+        var gray_colors = ['#d3d3d3', '#d3d3d3'];
+        var color_scale_map = d3.scaleLinear().domain([-17, -50000, -6000, -300, 0, 655555.5, 2000003]).range(red_green);
+        var grayScale = d3.scaleLinear().domain([0, 100]).range(gray_colors);
 
         //----------------Add the zoomed out map svg----------------
-        rawData = world_json_data;
-        countries = topojson.feature(rawData, rawData.objects.countries);
+        raw_data = world_json_data;
+        countries = topojson.feature(raw_data, raw_data.objects.countries);
         id_in_dict = function(val, arr) {
             return Object.values(arr).reduce((a, x) => a || val == x.id, false)
         }
         projection_out.fitExtent([
             [-2400, -850],
-            [3 * svgMap.attr("width"), 3 * svgMap.attr("height")]
+            [3 * svg_map.attr("width"), 3 * svg_map.attr("height")]
         ], countries);
         projection.fitExtent([
             [-5700, -2400],
-            [5.87 * svgZoom.attr("width"), 5.87 * svgZoom.attr("height")]
+            [5.87 * svg_zoom.attr("width"), 5.87 * svg_zoom.attr("height")]
         ], countries);
-        pathGenerator_out = d3.geoPath().projection(projection_out);
-        pathGenerator = d3.geoPath().projection(projection);
-        var path_all = svgMap.selectAll("path.country").data(countries.features);
+        path_generator_out = d3.geoPath().projection(projection_out);
+        path_generator = d3.geoPath().projection(projection);
+        var path_all = svg_map.selectAll("path.country").data(countries.features);
 
         path_all.enter().append("path").attr("class", "country")
             .merge(path_all)
             .attr("d", function(country) {
-                return pathGenerator_out(country);
+                return path_generator_out(country);
             })
             .attr("id", function(country) {
                 return country.id;
             })
             .style("stroke-width", "3px")
             .style("fill", function(country, ind) {
-                for (var i = 0; i < countryData.length; i++) {
-                    if (countryData[i].CountryId == country.id) {
-                        for (var k = countryBank.length - 1; k >= 0; k--) {
-                            if (countryData[i].Country == "SYR") {
+                for (var i = 0; i < country_data.length; i++) {
+                    if (country_data[i].CountryId == country.id) {
+                        for (var k = country_bank.length - 1; k >= 0; k--) {
+                            if (country_data[i].Country == "SYR") {
                                 return "rgb(139,0,0)";
-                            } else if (countryData[i].Country == countryBank[k].ThreeCode) {
-                                return colorScaleMap(countryBank[k].NetMigration);
+                            } else if (country_data[i].Country == country_bank[k].ThreeCode) {
+                                return color_scale_map(country_bank[k].Net_Migration);
                             }
                         }
 
@@ -405,13 +386,13 @@
                 }
                 return grayScale(ind + 5 % 20);
             });
-        svgMap.append("circle").attr("r", 202)
+        svg_map.append("circle").attr("r", 202)
             .style("fill", "none")
             .style("stroke", "black")
             .attr("cx", 403)
             .attr("cy", 395);
         //line on left side of circle
-        svgMap.append("line")
+        svg_map.append("line")
             .attr("x1", 201)
             .attr("y1", 395)
             .attr("x2", 0)
@@ -419,7 +400,7 @@
             .style("stroke", "black")
             .style("stroke-width", 1);
         //line on right side of circle
-        svgMap.append("line")
+        svg_map.append("line")
             .attr("x1", 605)
             .attr("y1", 395)
             .attr("x2", 800)
@@ -429,16 +410,16 @@
 
         //Add key for the Maps
         //gradient color scale
-        var linearGradient = svgZoom.append("linearGradient")
+        var linear_gradient = svg_zoom.append("linearGradient")
             .attr("id", "linear-gradient");
 
-        linearGradient
+        linear_gradient
             .attr("x1", "0%")
             .attr("y1", "0%")
             .attr("x2", "0%")
             .attr("y2", "100%");
 
-        svgMap.append("rect")
+        svg_map.append("rect")
             .attr("x", 500)
             .attr("y", 640)
             .attr("width", 20)
@@ -446,7 +427,7 @@
             .style("fill", "url(#linear-gradient)");
 
 
-        linearGradient.selectAll("stop")
+        linear_gradient.selectAll("stop")
             .data([{
                     offset: "0%",
                     color: "#8B0000"
@@ -488,7 +469,7 @@
                 return d.color;
             });
 
-        svgMap.append("text")
+        svg_map.append("text")
             .text("Most outgoing migration")
             .attr("x", 530)
             .attr("y", 645)
@@ -496,7 +477,7 @@
             .style("fill", "black")
             .attr("alignment-baseline", "central");
 
-        svgMap.append("text")
+        svg_map.append("text")
             .text("Most incoming migration")
             .attr("x", 530)
             .attr("y", 783)
@@ -505,12 +486,12 @@
             .attr("alignment-baseline", "central");
 
         //----------------Create the zoomed in map----------------
-        var paths = svgZoom.selectAll("path.country").data(countries.features);
+        var paths = svg_zoom.selectAll("path.country").data(countries.features);
         paths.enter().append("path").attr("class", "country")
             .merge(paths)
             .attr("d", function(country) {
                 if (Object.keys(id_to_country).includes('' + country.id)) {
-                    return pathGenerator(country);
+                    return path_generator(country);
                 }
             })
             .attr("id", function(country) {
@@ -518,13 +499,13 @@
             })
             .style("stroke-width", "4px")
             .style("fill", function(country, ind) {
-                for (var i = 0; i < countryData.length; i++) {
-                    if (countryData[i].CountryId == country.id) {
-                        for (var k = countryBank.length - 1; k >= 0; k--) {
-                            if (countryData[i].Country == "SYR") {
+                for (var i = 0; i < country_data.length; i++) {
+                    if (country_data[i].CountryId == country.id) {
+                        for (var k = country_bank.length - 1; k >= 0; k--) {
+                            if (country_data[i].Country == "SYR") {
                                 return "rgb(139,0,0)";
-                            } else if (countryData[i].Country == countryBank[k].ThreeCode) {
-                                return colorScaleMap(countryBank[k].NetMigration);
+                            } else if (country_data[i].Country == country_bank[k].ThreeCode) {
+                                return color_scale_map(country_bank[k].Net_Migration);
                             }
                         };
                     }
@@ -534,16 +515,16 @@
 
         //Add key for the Maps
         //gradient color scale
-        var linearGradient = svgZoom.append("linearGradient")
+        var linear_gradient = svg_zoom.append("linear_gradient")
             .attr("id", "linear-gradient");
 
-        linearGradient
+        linear_gradient
             .attr("x1", "0%")
             .attr("y1", "0%")
             .attr("x2", "0%")
             .attr("y2", "100%");
 
-        svgZoom.append("rect")
+        svg_zoom.append("rect")
             .attr("x", 30)
             .attr("y", 630)
             .attr("width", 20)
@@ -551,7 +532,7 @@
             .style("fill", "url(#linear-gradient)");
 
 
-        linearGradient.selectAll("stop")
+        linear_gradient.selectAll("stop")
             .data([{
                     offset: "0%",
                     color: "#8B0000"
@@ -593,7 +574,7 @@
                 return d.color;
             });
 
-        svgZoom.append("text")
+        svg_zoom.append("text")
             .text("Most outgoing migration")
             .attr("x", 60)
             .attr("y", 635)
@@ -601,7 +582,7 @@
             .style("fill", "black")
             .attr("alignment-baseline", "central");
 
-        svgZoom.append("text")
+        svg_zoom.append("text")
             .text("Most incoming migration rate")
             .attr("x", 60)
             .attr("y", 773)
@@ -610,101 +591,101 @@
             .attr("alignment-baseline", "central");
 
         //----------------Create Bar Chart of Net Migration----------------
-        var xScale = d3.scaleLinear().domain([0, 15]).range([90, 1085]);
-        var migrationScale = d3.scaleLinear().domain([-80.0004, 249.9996]).range([490, 40]);
+        var x_scale = d3.scaleLinear().domain([0, 15]).range([90, 1085]);
+        var migration_scale = d3.scaleLinear().domain([-80.0004, 249.9996]).range([490, 40]);
 
         //add axis and labels
-        var yAxis = d3.axisLeft(migrationScale);
-        var plot = svgChart.append("g");
+        var yAxis = d3.axisLeft(migration_scale);
+        var plot = svg_chart.append("g");
         plot.append("g").call(yAxis).attr("transform", "translate(60,0)").style("opacity", 0.75);
 
-        svgChart.append("text")
+        svg_chart.append("text")
             .text("Most incoming migration rate")
             .attr("x", 15)
-            .attr("y", migrationScale(260))
+            .attr("y", migration_scale(260))
             .attr("font-size", "20px")
             .style("fill", "black")
             .attr("alignment-baseline", "central");
 
-        svgChart.append("text")
+        svg_chart.append("text")
             .text("Most outgoing migration rate")
             .attr("x", 15)
-            .attr("y", migrationScale(-110))
+            .attr("y", migration_scale(-110))
             .attr("font-size", "20px")
             .style("fill", "black")
             .attr("alignment-baseline", "central");
 
         //Line at 0
-        svgChart.append("line")
+        svg_chart.append("line")
             .attr("x1", 60)
-            .attr("y1", migrationScale(0))
+            .attr("y1", migration_scale(0))
             .attr("x2", 1185)
-            .attr("y2", migrationScale(0))
+            .attr("y2", migration_scale(0))
             .style("stroke", "black")
             .style("stroke-width", .75)
             .style("opacity", 0.75);
 
 
-        //Sort the countryData by the net migration
-        countryData.sort(function(a, b) {
-            return parseFloat(a.NetMigration) - parseFloat(b.NetMigration);
+        //Sort the country_data by the net migration
+        country_data.sort(function(a, b) {
+            return parseFloat(a.Net_Migration) - parseFloat(b.Net_Migration);
         });
-        //Sort the countryData by the net migration
-        countryBank.sort(function(a, b) {
-            return parseFloat(a.NetMigration) - parseFloat(b.NetMigration);
+        //Sort the country_data by the net migration
+        country_bank.sort(function(a, b) {
+            return parseFloat(a.Net_Migration) - parseFloat(b.Net_Migration);
         });
 
         i = 0;
-        countryData.forEach(function(d) {
+        country_data.forEach(function(d) {
             if (d.Country in country_id) {
-                y2 = migrationScale(d.NetMigration);
-                if (d.NetMigration < 1) {
-                    svgChart.append("line")
-                        .attr("x1", xScale(i))
-                        .attr("y1", migrationScale(0))
-                        .attr("x2", xScale(i))
+                y2 = migration_scale(d.Net_Migration);
+                if (d.Net_Migration < 1) {
+                    svg_chart.append("line")
+                        .attr("x1", x_scale(i))
+                        .attr("y1", migration_scale(0))
+                        .attr("x2", x_scale(i))
                         .attr("y2", y2)
                         .style("stroke", "#E21223")
                         .style("stroke-width", 25)
                         .style("opacity", 0.75);
 
-                    svgChart.append("text")
+                    svg_chart.append("text")
                         .text(country_id[d.Country].name)
-                        .attr("x", xScale(i))
+                        .attr("x", x_scale(i))
                         .attr("y", y2 + 15)
                         .attr("font-size", "14px")
                         .style("fill", "black")
                         .attr("text-anchor", "middle");
                 } else if (d.Country == "ARE") {
-                    svgChart.append("line")
-                        .attr("x1", xScale(i))
-                        .attr("y1", migrationScale(0))
-                        .attr("x2", xScale(i))
+                    svg_chart.append("line")
+                        .attr("x1", x_scale(i))
+                        .attr("y1", migration_scale(0))
+                        .attr("x2", x_scale(i))
                         .attr("y2", y2)
                         .style("stroke", "#29BF12")
                         .style("stroke-width", 25)
                         .style("opacity", 0.75);
 
-                    svgChart.append("text")
+                    svg_chart.append("text")
                         .text(country_id[d.Country].name)
-                        .attr("x", xScale(i) - 6)
+                        .attr("x", x_scale(i) - 6)
                         .attr("y", y2 - 10)
                         .attr("font-size", "14px")
                         .style("fill", "black")
                         .attr("text-anchor", "middle");
                 } else {
-                    svgChart.append("line")
-                        .attr("x1", xScale(i))
-                        .attr("y1", migrationScale(0))
-                        .attr("x2", xScale(i))
+                    svg_chart.append("line")
+                        .attr("x1", x_scale(i))
+                        .attr("y1", migration_scale(0))
+                        .attr("x2", x_scale(i))
                         .attr("y2", y2)
                         .style("stroke", "#29BF12")
                         .style("stroke-width", 25)
                         .style("opacity", 0.75);
 
-                    svgChart.append("text")
+                    svg_chart.append("text")
                         .text(country_id[d.Country].name)
-                        .attr("x", xScale(i))
+                        .attr("x", x_scale(i))
                         .attr("y", y2 - 10)
                         .attr("font-size", "14px")
                         .style("fill", "black")
@@ -715,90 +696,90 @@
         });
 
 
-        var xScale = d3.scaleLinear().domain([0, 15]).range([90, 1085]);
-        var migrationScale_actual = d3.scaleLinear().domain([-4029996, 2000003]).range([850, 40]);
+        var x_scale = d3.scaleLinear().domain([0, 15]).range([90, 1085]);
+        var migration_scale_actual = d3.scaleLinear().domain([-4029996, 2000003]).range([850, 40]);
 
         //add axis and labels
-        var yAxis = d3.axisLeft(migrationScale_actual);
-        var plot = svgChartActual.append("g");
+        var yAxis = d3.axisLeft(migration_scale_actual);
+        var plot = svg_chart_actual.append("g");
         plot.append("g").call(yAxis).attr("transform", "translate(60,0)").style("opacity", 0.75);
 
-        svgChartActual.append("text")
+        svg_chart_actual.append("text")
             .text("Most incoming migration rate")
             .attr("x", 15)
-            .attr("y", migrationScale_actual(2150000))
+            .attr("y", migration_scale_actual(2150000))
             .attr("font-size", "20px")
             .style("fill", "black")
             .attr("alignment-baseline", "central");
 
-        svgChartActual.append("text")
+        svg_chart_actual.append("text")
             .text("Most outgoing migration rate")
             .attr("x", 15)
-            .attr("y", migrationScale_actual(-4250000))
+            .attr("y", migration_scale_actual(-4250000))
             .attr("font-size", "20px")
             .style("fill", "black")
             .attr("alignment-baseline", "central");
 
         //Line at 0
-        svgChartActual.append("line")
+        svg_chart_actual.append("line")
             .attr("x1", 60)
-            .attr("y1", migrationScale_actual(0))
+            .attr("y1", migration_scale_actual(0))
             .attr("x2", 1185)
-            .attr("y2", migrationScale_actual(0))
+            .attr("y2", migration_scale_actual(0))
             .style("stroke", "black")
             .style("stroke-width", .75)
             .style("opacity", 0.75);
         var l = 0;
-        countryBank.forEach(function(d) {
+        country_bank.forEach(function(d) {
             if (d.ThreeCode in country_id) {
-                y2 = migrationScale_actual(d.NetMigration);
-               if (d.NetMigration < 1) {
-                    svgChartActual.append("line")
-                        .attr("x1", xScale(l))
-                        .attr("y1", migrationScale_actual(0))
-                        .attr("x2", xScale(l))
+                y2 = migration_scale_actual(d.Net_Migration);
+               if (d.Net_Migration < 1) {
+                    svg_chart_actual.append("line")
+                        .attr("x1", x_scale(l))
+                        .attr("y1", migration_scale_actual(0))
+                        .attr("x2", x_scale(l))
                         .attr("y2", y2)
                         .style("stroke", "#E21223")
                         .style("stroke-width", 25)
                         .style("opacity", 0.75);
-                    svgChartActual.append("text")
+                    svg_chart_actual.append("text")
                         .text(country_id[d.ThreeCode].name)
-                        .attr("x", xScale(l)+5)
+                        .attr("x", x_scale(l)+5)
                         .attr("y", y2 + 15)
                         .attr("font-size", "13px")
                         .style("fill", "black")
                         .attr("text-anchor", "middle");
                 }else if (d.Country == "ARE") {
-                    svgChartActual.append("line")
-                        .attr("x1", xScale(i))
-                        .attr("y1", migrationScale_actual(0))
-                        .attr("x2", xScale(i))
+                    svg_chart_actual.append("line")
+                        .attr("x1", x_scale(i))
+                        .attr("y1", migration_scale_actual(0))
+                        .attr("x2", x_scale(i))
                         .attr("y2", y2)
                         .style("stroke", "#29BF12")
                         .style("stroke-width", 25)
                         .style("opacity", 0.75);
 
-                    svgChartActual.append("text")
+                    svg_chart_actual.append("text")
                         .text(country_id[d.ThreeCode].name)
-                        .attr("x", xScale(i) +5)
+                        .attr("x", x_scale(i) +5)
                         .attr("y", y2 - 25)
                         .attr("font-size", "9px")
                         .style("fill", "black")
                         .attr("text-anchor", "middle");
                 }
                else {
-                    svgChartActual.append("line")
-                        .attr("x1", xScale(l))
-                        .attr("y1", migrationScale_actual(0))
-                        .attr("x2", xScale(l))
+                    svg_chart_actual.append("line")
+                        .attr("x1", x_scale(l))
+                        .attr("y1", migration_scale_actual(0))
+                        .attr("x2", x_scale(l))
                         .attr("y2", y2)
                         .style("stroke", "#29BF12")
                         .style("stroke-width", 25)
                         .style("opacity", 0.75);
 
-                    svgChartActual.append("text")
+                    svg_chart_actual.append("text")
                         .text(country_id[d.ThreeCode].name)
-                        .attr("x", xScale(l)+5)
+                        .attr("x", x_scale(l)+5)
                         .attr("y", y2 - 10)
                         .attr("font-size", "13px")
                         .style("fill", "black")
@@ -807,30 +788,29 @@
                 l += 1;
             }
         });
-        popAreaData = pop_area.countries;
-
+        
         //---------- Projected vs Actual Net Migration Scatter Linear Plot---------------
         
         var mideast = countries.features.filter((a) => id_to_ind.includes(a.id));
         
         function find_country_index(id) {
-            notFound = true;
+            not_found = true;
             i = 0;
             str_id = '' + id;
             if (str_id.length == 2) {
                 str_id = "0" + str_id;
             }
-            while (i < countryData.length & notFound) {
-                if (countryData[i].CountryId == str_id) {
-                    notFound = false;
+            while (i < country_data.length & not_found) {
+                if (country_data[i].CountryId == str_id) {
+                    not_found = false;
                     return i;
                 }
                 i += 1;
             }
         }
 
-        function find_countryBank_index(country_name) {
-            notFound = true;
+        function find_country_bank_index(country_name) {
+            not_found = true;
             if (country_name == "Egypt") {
                 country_name = "Egypt, Arab Rep.";
             } else if (country_name == "Iran") {
@@ -844,9 +824,9 @@
             }
 
             i = 0;
-            while (i < countryBank.length & notFound) {
-                if (countryBank[i].Country == country_name) {
-                    notFound = false;
+            while (i < country_bank.length & not_found) {
+                if (country_bank[i].Country == country_name) {
+                    not_found = false;
                     return i;
                 }
                 i += 1;
@@ -857,14 +837,14 @@
 
         // set up scales
         // actual
-        var xScale_migrate = d3.scaleLinear().domain([-4420000, 2060000]).range([30, 1350]);
+        var x_scale_actual = d3.scaleLinear().domain([-4420000, 2060000]).range([30, 1350]);
         // projected
-        var yScale_migrate = d3.scaleLinear().domain([-100000, 300000]).range([775, 15]);
+        var yScale_projected = d3.scaleLinear().domain([-100000, 300000]).range([775, 15]);
         
-        var botAxis_migrate = d3.axisBottom(xScale_migrate).ticks(8).tickSize(9);
-        var leftAxis_migrate = d3.axisLeft(yScale_migrate).ticks(5).tickSize(9);
+        var botAxis_migrate = d3.axisBottom(x_scale_actual).ticks(8).tickSize(9);
+        var leftAxis_migrate = d3.axisLeft(yScale_projected).ticks(5).tickSize(9);
 
-        var country_group_inf_migrate = netmigration_svg.selectAll('g')
+        var country_group_inf_migrate = net_migration_svg.selectAll('g')
             .data(mideast)
             .enter()
             .append('g')
@@ -873,7 +853,7 @@
         country_group_inf_migrate
             .append('path')
             .attr('d', function(country) {
-                return pathGenerator(country);
+                return path_generator(country);
             })
             .style("opacity", .4)
             .style("fill", function(country, ind) {
@@ -884,42 +864,33 @@
                 top_left_x = -x_cent * small_scale_country_id[country.id];
                 top_left_y = -y_cent * small_scale_country_id[country.id];
                 country_name = id_to_country[country.id]
-                country_bank_index = find_countryBank_index(country_name)
+                country_bank_index = find_country_bank_index(country_name)
                 country_index = find_country_index(country.id)
-                    
-                if (countryBank[country_index] != undefined) {
-                    migrate_x = xScale_migrate(Number(countryBank[country_bank_index].NetMigration))
-                    migrants_projected = Number(countryData[country_index].NetMigration) *1000;
-                    migrate_y = yScale_migrate(migrants_projected); 
-                    
-                } else {
-                    migrate_x = 0;
-                    migrate_y = 0;
-                }
+                
+                migrate_x = x_scale_actual(Number(country_bank[country_bank_index].Net_Migration))
+                migrants_projected = Number(country_data[country_index].Net_Migration) *1000;
+                migrate_y = yScale_projected(migrants_projected); 
+                
                 return "translate(" + top_left_x + "," + top_left_y + ")translate(" +
                     migrate_x + "," + migrate_y + ")  scale(" + small_scale_country_id[country.id] + ") ";
             });
-        // add country name for actual
+        
         country_group_inf_migrate
             .append('text')
             .style("font-size", "10pt")
             .attr("transform", function(country, ind) {
                 country_name = id_to_country[country.id]
                 country_index = find_country_index(country.id)
-                country_bank_index = find_countryBank_index(country_name)
-                if (countryBank[country_index] != undefined) {
-                    migrate_x_text = xScale_migrate(Number(countryBank[country_bank_index].NetMigration)) -10;
-                    migrants_projected = Number(countryData[country_index].NetMigration) *1000;
-                    migrate_y_text = yScale_migrate(migrants_projected); 
-                    if (country_name == "Israel"){
-                        migrate_x_text -= 35;
-                        migrate_y_text += 10;
-                    }
-                    else if (country_name == "Bahrain"){
-                        migrate_x_text += 15;
-                    }
-                } else {
-                    migrate_y_text = 0;
+                country_bank_index = find_country_bank_index(country_name)
+                migrate_x_text = x_scale_actual(Number(country_bank[country_bank_index].Net_Migration)) -10;
+                migrants_projected = Number(country_data[country_index].Net_Migration) *1000;
+                migrate_y_text = yScale_projected(migrants_projected); 
+                if (country_name == "Israel"){
+                    migrate_x_text -= 35;
+                    migrate_y_text += 10;
+                }
+                else if (country_name == "Bahrain"){
+                    migrate_x_text += 15;
                 }
                 return "translate(" + migrate_x_text + "," + migrate_y_text + ")";
             })
@@ -927,7 +898,7 @@
                 return id_to_country['' + country.id];
             });
         // add axeses
-        var actual_vs_projected_plot = netmigration_svg.append("g");
+        var actual_vs_projected_plot = net_migration_svg.append("g");
         actual_vs_projected_plot.append("g").style("font", "15px times")
             .call(botAxis_migrate).attr("transform", "translate(0,585)");
         actual_vs_projected_plot.append("g").style("font", "15px times")
