@@ -1015,8 +1015,6 @@
                 country_bank_index = find_countryBank_index(country_name)
                 country_index = find_country_index(country.id)
                     
-                //country_mort_index = find_countryMort_index(country_name)
-                console.log(countryBank[country_index])
                 if (countryBank[country_index] != undefined) {
                     migrate_x = xScale_infant_migrate(Number(countryBank[country_bank_index].NetMigration))
                     migrants_projected = Number(countryData[country_index].NetMigration) *1000;
@@ -1037,7 +1035,6 @@
             .style("font-size", "10pt")
             .attr("transform", function(country, ind) {
                 country_name = id_to_country[country.id]
-                country_mort_index = find_countryMort_index(country_name)
                 country_index = find_country_index(country.id)
                 country_bank_index = find_countryBank_index(country_name)
                 if (countryBank[country_index] != undefined) {
