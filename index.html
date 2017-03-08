@@ -95,7 +95,8 @@
         .style("background", "#E2FCFF"); //makes the svg map background light blue;
     var svg_zoom = d3.select("#maps").append("svg").attr("width", 800).attr("height", 800)
         .style("background", "#E2FCFF"); //makes the svg map background light blue;
-    var svg_chart = d3.select("#predicted_barchart").append("svg").attr("width", 1200).attr("height", 550).style("background", "#FCFEFF");
+
+    var svg_chart = d3.select("#predicted_barchart").append("svg").attr("width", 1200).attr("height", 600).style("background", "#FCFEFF");
     var svg_chart_actual = d3.select("#actual_barchart").append("svg").attr("width", 1200).attr("height", 900).style("background", "#FCFEFF");
     var net_migration_svg = d3.select("#scatter").append("svg").attr("width", 1400).attr("height", 800)
         .style("background", "#FCFEFF");
@@ -591,8 +592,9 @@
             .attr("alignment-baseline", "central");
 
         //----------------Create Bar Chart of Net Migration----------------
+
         var x_scale = d3.scaleLinear().domain([0, 15]).range([90, 1085]);
-        var migration_scale = d3.scaleLinear().domain([-80.0004, 249.9996]).range([490, 40]);
+        var migration_scale = d3.scaleLinear().domain([-80000.4, 249999.6]).range([540, 40]);
 
         //add axis and labels
         var yAxis = d3.axisLeft(migration_scale);
@@ -600,17 +602,16 @@
         plot.append("g").call(yAxis).attr("transform", "translate(60,0)").style("opacity", 0.75);
 
         svg_chart.append("text")
-            .text("Most incoming migration rate")
+            .text("Most incoming migration")
             .attr("x", 15)
-            .attr("y", migration_scale(260))
+            .attr("y", migrationScale(260000))
             .attr("font-size", "20px")
             .style("fill", "black")
             .attr("alignment-baseline", "central");
-
         svg_chart.append("text")
-            .text("Most outgoing migration rate")
+            .text("Most outgoing migration")
             .attr("x", 15)
-            .attr("y", migration_scale(-110))
+            .attr("y", migrationScale(-110000))
             .attr("font-size", "20px")
             .style("fill", "black")
             .attr("alignment-baseline", "central");
@@ -638,12 +639,12 @@
         i = 0;
         country_data.forEach(function(d) {
             if (d.Country in country_id) {
-                y2 = migration_scale(d.Net_Migration);
+                y2 = migrationScale(d.Net_Migration*1000);
                 if (d.Net_Migration < 1) {
                     svg_chart.append("line")
-                        .attr("x1", x_scale(i))
-                        .attr("y1", migration_scale(0))
-                        .attr("x2", x_scale(i))
+                        .attr("x1", xScale(i))
+                        .attr("y1", migrationScale(0))
+                        .attr("x2", xScale(i))
                         .attr("y2", y2)
                         .style("stroke", "#E21223")
                         .style("stroke-width", 25)
@@ -705,7 +706,7 @@
         plot.append("g").call(yAxis).attr("transform", "translate(60,0)").style("opacity", 0.75);
 
         svg_chart_actual.append("text")
-            .text("Most incoming migration rate")
+            .text("Most incoming migration")
             .attr("x", 15)
             .attr("y", migration_scale_actual(2150000))
             .attr("font-size", "20px")
@@ -713,7 +714,7 @@
             .attr("alignment-baseline", "central");
 
         svg_chart_actual.append("text")
-            .text("Most outgoing migration rate")
+            .text("Most outgoing migration")
             .attr("x", 15)
             .attr("y", migration_scale_actual(-4250000))
             .attr("font-size", "20px")
