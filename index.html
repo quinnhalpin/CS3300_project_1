@@ -94,15 +94,14 @@
     var projection = d3.geoMercator().scale(125);
     var projection_out = d3.geoMercator().scale(300);
     var projection3 = d3.geoMercator().scale(300);
-    var pathGenerator2 = d3.geoPath().projection(projection);
-    var pathGenerator3 = d3.geoPath().projection(projection3);
+    var pathGenerator = d3.geoPath().projection(projection);
     var svgMap = d3.select("#p1").append("svg").attr("width", 800).attr("height", 800)
         .style("background", "#E2FCFF"); //makes the svg map background light blue;
     var svgZoom = d3.select("#p1").append("svg").attr("width", 800).attr("height", 800)
         .style("background", "#E2FCFF"); //makes the svg map background light blue;
     var svgChart = d3.select("#p2").append("svg").attr("width", 1200).attr("height", 550).style("background", "#FCFEFF");
     var svgChartActual = d3.select("#p2_actual").append("svg").attr("width", 1200).attr("height", 900).style("background", "#FCFEFF");
-    var infantMort_netmigration_svg = d3.select("#p_scatter").append("svg").attr("width", 1200).attr("height", 800)
+    var netmigration_svg = d3.select("#p_scatter").append("svg").attr("width", 1400).attr("height", 800)
         .style("background", "#FCFEFF");
 
     d3.queue()
@@ -324,7 +323,7 @@
         "634": "Qatar",
         "682": "Saudi Arabia",
         "760": "Syria",
-        "784": "UAE",
+        "784": "U. Arab Emirates",
         "792": "Turkey",
         "887": "Yemen",
     }
@@ -486,7 +485,7 @@
             [5.87 * svgZoom.attr("width"), 5.87 * svgZoom.attr("height")]
         ], countries);
         pathGenerator_out = d3.geoPath().projection(projection_out);
-        pathGenerator2 = d3.geoPath().projection(projection);
+        pathGenerator = d3.geoPath().projection(projection);
         var path_all = svgMap.selectAll("path.country").data(countries.features);
 
         path_all.enter().append("path").attr("class", "country")
@@ -618,7 +617,7 @@
             .merge(paths)
             .attr("d", function(country) {
                 if (Object.keys(id_to_country).includes('' + country.id)) {
-                    return pathGenerator2(country);
+                    return pathGenerator(country);
                 }
             })
             .attr("id", function(country) {
@@ -938,35 +937,10 @@
         });
         popAreaData = pop_area.countries;
 
-        // ---------Infant Mortality vs Net Migration Scatter Log Plot---------------
+        //---------- Projected vs Actual Net Migration Scatter Linear Plot---------------
+        
         var mideast = countries.features.filter((a) => id_to_ind.includes(a.id));
-        // set up scales
-        migration_log = [];
-        id_to_ind.forEach(function(id) {
-            country_name = id_to_country[id]
-            country_index = find_countryBank_index(country_name)
-            migration = Number(countryBank[country_index].NetMigration)
-            abs_migration = Math.abs(migration)
-            migrate_x = Math.log10(abs_migration)
-            if (migration < 0) {
-                migrate_x = migrate_x * -1;
-            }
-            migration_log[id] = migrate_x;
-        })
-        infant_log = [];
-        id_to_ind.forEach(function(id) {
-            country_name = id_to_country[id]
-            country_index = find_countryMort_index(country_name)
-            infant = Number(countryMort[country_index].InfantMort)
-            console.log(infant)
-            abs_infant = Math.abs(infant)
-            infant_y = Math.log10(abs_infant)
-            if (infant < 0) {
-                infant_y = infant_y * -1;
-            }
-            infant_log[id] = infant_y;
-        })
-
+        
         function find_country_index(id) {
             notFound = true;
             i = 0;
@@ -993,7 +967,7 @@
                 country_name = "Syrian Arab Republic";
             } else if (country_name == "Yemen") {
                 country_name = "Yemen, Rep.";
-            } else if (country_name == "UAE") {
+            } else if (country_name == "U. Arab Emirates") {
                 country_name = "United Arab Emirates";
             }
 
@@ -1008,43 +982,17 @@
 
         }
 
-        function find_countryMort_index(country_name) {
-            notFound = true;
-            if (country_name == "Egypt") {
-                country_name = "Egypt, Arab Rep.";
-            } else if (country_name == "Iran") {
-                country_name = "Iran, Islamic Rep.";
-            } else if (country_name == "Syria") {
-                country_name = "Syrian Arab Republic";
-            } else if (country_name == "Yemen") {
-                country_name = "Yemen, Rep.";
-            } else if (country_name == "UAE") {
-                country_name = "United Arab Emirates";
-            }
 
-            i = 0;
-            while (i < countryBank.length & notFound) {
-                if (countryBank[i].Country == country_name) {
-                    notFound = false;
-                    return i;
-                }
-                i += 1;
-            }
-        }
-
-
-
-        //---------- Infant Mortality vs Net Migration Scatter Linear Plot---------------
+        // set up scales
         // actual
-        var xScale_infant_migrate = d3.scaleLinear().domain([-4420000, 2060000]).range([30, 1150]);
+        var xScale_infant_migrate = d3.scaleLinear().domain([-4420000, 2060000]).range([30, 1350]);
         // projected
         var yScale_infant_migrate = d3.scaleLinear().domain([-100000, 300000]).range([775, 15]);
         
-        //var yScale_infant_migrate = d3.scaleLinear().domain([0, 64]).range([725, 15]);
-        var botAxis_infant_migrate = d3.axisBottom(xScale_infant_migrate).ticks(8).tickSize(9);
-        var leftAxis_infant_migrate = d3.axisLeft(yScale_infant_migrate).ticks(5).tickSize(9);
+        var botAxis_migrate = d3.axisBottom(xScale_infant_migrate).ticks(8).tickSize(9);
+        var leftAxis_migrate = d3.axisLeft(yScale_infant_migrate).ticks(5).tickSize(9);
 
-        var country_group_inf_migrate = infantMort_netmigration_svg.selectAll('g')
+        var country_group_inf_migrate = netmigration_svg.selectAll('g')
             .data(mideast)
             .enter()
             .append('g')
@@ -1053,7 +1001,7 @@
         country_group_inf_migrate
             .append('path')
             .attr('d', function(country) {
-                return pathGenerator2(country);
+                return pathGenerator(country);
             })
             .style("opacity", .4)
             .style("fill", function(country, ind) {
@@ -1070,8 +1018,6 @@
                 //country_mort_index = find_countryMort_index(country_name)
                 console.log(countryBank[country_index])
                 if (countryBank[country_index] != undefined) {
-                    //migrate_y = yScale_infant_migrate(Number(countryBank[country_index].NetMigration))
-                    //infant_y = yScale_infant_migrate(Number(countryMort[country_mort_index].InfantMort))
                     migrate_x = xScale_infant_migrate(Number(countryBank[country_bank_index].NetMigration))
                     migrants_projected = Number(countryData[country_index].NetMigration) *1000;
                     migrate_y = yScale_infant_migrate(migrants_projected); 
@@ -1079,7 +1025,7 @@
                 } else {
                     console.log("cannot find")
                     console.log(country_index)
-                    //infant_x = 0;
+                    migrate_x = 0;
                     migrate_y = 0;
                 }
                 return "translate(" + top_left_x + "," + top_left_y + ")translate(" +
@@ -1098,8 +1044,14 @@
                     migrate_x_text = xScale_infant_migrate(Number(countryBank[country_bank_index].NetMigration)) -10;
                     migrants_projected = Number(countryData[country_index].NetMigration) *1000;
                     migrate_y_text = yScale_infant_migrate(migrants_projected); 
+                    if (country_name == "Israel"){
+                        migrate_x_text -= 35;
+                        migrate_y_text += 10;
+                    }
+                    else if (country_name == "Bahrain"){
+                        migrate_x_text += 15;
+                    }
                 } else {
-                    //infant_x_text = 0;
                     migrate_y_text = 0;
                 }
                 return "translate(" + migrate_x_text + "," + migrate_y_text + ")";
@@ -1109,20 +1061,20 @@
                 return id_to_country['' + country.id];
             });
         // add axeses
-        var inf_migrate_plot = infantMort_netmigration_svg.append("g");
-        inf_migrate_plot.append("g").style("font", "15px times")
-            .call(botAxis_infant_migrate).attr("transform", "translate(0,543)");
-        inf_migrate_plot.append("g").style("font", "15px times")
-            .call(leftAxis_infant_migrate).attr("transform", "translate(522,0)");
-        inf_migrate_plot
+        var actual_vs_projected_plot = netmigration_svg.append("g");
+        actual_vs_projected_plot.append("g").style("font", "15px times")
+            .call(botAxis_migrate).attr("transform", "translate(0,585)");
+        actual_vs_projected_plot.append("g").style("font", "15px times")
+            .call(leftAxis_migrate).attr("transform", "translate(930,0)");
+        actual_vs_projected_plot
             .append("text")
             .style("font-size", "14pt")
             .attr("x", "-380")
-            .attr("y", "555")
+            .attr("y", "855")
             .attr("font-weight", "bold")
             .attr("transform", "rotate(-90)")
             .text("Projected Net Migration for 2015")
-        inf_migrate_plot.append("text")
+        actual_vs_projected_plot.append("text")
             .text("Actual Net Migration from 2012")
             .attr("x", 90)
             .attr("y", 522)
