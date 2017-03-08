@@ -107,8 +107,6 @@
     d3.queue()
         .defer(d3.csv, "large-tabular.csv")
         .defer(d3.csv, "net_migration_mideast.csv")
-        .defer(d3.csv, "mortality_rate_mideast.csv")
-        .defer(d3.csv, "unemployment_rate_mideast.csv")
         .defer(d3.json, "world-50m.json")
         .defer(d3.json, "middle_east_pop_area.json")
         .await(done_function);
@@ -170,40 +168,6 @@
             "id": 368
         },
     }
-    banned_country = {
-        "IRQ": {
-            "ind": 3,
-            "id": 368
-        },
-        "SYR": {
-            "ind": 12,
-            "id": 760
-        },
-        "YEM": {
-            "ind": 15,
-            "id": 887
-        },
-        "LBY": {
-            "ind": 16,
-            "id": 434
-        },
-        "SDN": {
-            "ind": 17,
-            "id": 736
-        },
-        "SOM": {
-            "ind": 18,
-            "id": 706
-        }
-    }
-    old_ban = {
-        "IRN": {
-            "ind": 2,
-            "id": 364
-        }
-    };
-    banned_id = [368, 760, 887, 434, 736, 706];
-    old_ban_id = [364];
     country_id = {
         "BHR": {
             "name": "Bahrain",
@@ -327,40 +291,13 @@
         "792": "Turkey",
         "887": "Yemen",
     }
-    id_to_country_Trump = {
-        "48": "Bahrain",
-        "818": "Egypt",
-        "364": "Iran",
-        "368": "Iraq",
-        "376": "Israel",
-        "400": "Jordan",
-        "414": "Kuwait",
-        "422": "Lebanon",
-        "512": "Oman",
-        "275": "Palestine",
-        "634": "Qatar",
-        "682": "Saudi Arabia",
-        "760": "Syria",
-        "784": "United Arab Emirates",
-        "792": "Turkey",
-        "887": "Yemen",
-        "434": "Libya",
-        "736": "Sudan",
-        "706": "Somalia"
-    }
-
     id_to_ind = [48, 818, 364, 368, 376, 400, 414, 422, 512, 634, 682, 760, 784, 792, 887];
-    id_to_ind_Trump = [48, 818, 364, 368, 376, 400, 414, 422, 512, 275, 634, 682, 760, 784, 792, 887, 434, 736, 706];
-
-
 
     /* This function returns an array countryData containing an object for each country with fields of the 2015 data for each variable*/
 
-    function done_function(error, csv_data, bank_csv, mort_csv, unemploy_csv, world_json_data, pop_area) {
+    function done_function(error, csv_data, bank_csv, world_json_data, pop_area) {
         dataset = csv_data;
         bankdata = bank_csv;
-        mortdata = mort_csv;
-        unempdata = unemploy_csv;
         nestedData = d3.nest()
             .key(function(d) {
                 return d.REF_AREA;
@@ -371,16 +308,7 @@
                 return d.Country_Name;
             })
             .entries(bank_csv);
-        nestMortData = d3.nest()
-            .key(function(d) {
-                return d.Country_Name;
-            })
-            .entries(mort_csv);
-        nestEmpData = d3.nest()
-            .key(function(d) {
-                return d.Country_Name;
-            })
-            .entries(unemploy_csv);
+        
         // Country bank has all values for netMigration stored with index 0 being 1960 and index 57 being 2016. Most values are empty strings but all are defined.
         countryBank = nestBankData.map(function(country) {
             var bankResult = {
@@ -397,38 +325,7 @@
             bankResult.ThreeCode = country.values[0].Country_Code;
             return bankResult;
         });
-        countryMort = nestMortData.map(function(country) {
-            var mortResult = {
-                Country: country.key
-            };
-            yearValue = Object(country.values[0]);
-            var keys = Object.keys(yearValue).slice(0, 57);
-            var values = Object.values(yearValue).slice(0, 57);
-            mortResult.Years = keys;
-            mortResult.Values = values;
-            // Returns the 2012 value for InfantMort
-            mortResult.InfantMort = values[52];
-            //threeCode is the Three digit country code
-            mortResult.ThreeCode = country.values[0].Country_Code;
-            return mortResult;
-        });
-        countryUnemploy = nestEmpData.map(function(country) {
-            var empResult = {
-                Country: country.key
-            };
-            yearValue = Object(country.values[0]);
-            var keys = Object.keys(yearValue).slice(0, 57);
-            var values = Object.values(yearValue).slice(0, 57);
-            empResult.Years = keys;
-            empResult.Values = values;
-            // Returns the 2012 value for InfantMort
-            empResult.Unemploy = values[52];
-            //threeCode is the Three digit country code
-            empResult.ThreeCode = country.values[0].Country_Code;
-            return empResult;
-        });
-
-
+        
         countryData = nestedData.map(function(country) {
             var result = {
                 Country: country.key
@@ -765,7 +662,6 @@
         countryData.forEach(function(d) {
             if (d.Country in country_id) {
                 y2 = migrationScale(d.NetMigration);
-                // console.log(country_id[d.Country].name + " " + d.NetMigration)
                 if (d.NetMigration < 1) {
                     svgChart.append("line")
                         .attr("x1", xScale(i))
@@ -860,9 +756,7 @@
         countryBank.forEach(function(d) {
             if (d.ThreeCode in country_id) {
                 y2 = migrationScale_actual(d.NetMigration);
-                console.log("here")
-                console.log(d.Country + " " + d.NetMigration)
-                if (d.NetMigration < 1) {
+               if (d.NetMigration < 1) {
                     svgChartActual.append("line")
                         .attr("x1", xScale(l))
                         .attr("y1", migrationScale_actual(0))
@@ -896,25 +790,7 @@
                         .style("fill", "black")
                         .attr("text-anchor", "middle");
                 }
-                // else if (d.Country == "KWT") {
-                //     svgChartActual.append("line")
-                //         .attr("x1", xScale(i))
-                //         .attr("y1", migrationScale_actual(0))
-                //         .attr("x2", xScale(i))
-                //         .attr("y2", y2)
-                //         .style("stroke", "#29BF12")
-                //         .style("stroke-width", 25)
-                //         .style("opacity", 0.75);
-
-                //     svgChartActual.append("text")
-                //         .text(country_id[d.ThreeCode].name)
-                //         .attr("x", xScale(i) +5)
-                //         .attr("y", y2 - 50)
-                //         .attr("font-size", "14px")
-                //         .style("fill", "black")
-                //         .attr("text-anchor", "middle");
-                // } 
-                else {
+               else {
                     svgChartActual.append("line")
                         .attr("x1", xScale(l))
                         .attr("y1", migrationScale_actual(0))
@@ -985,12 +861,12 @@
 
         // set up scales
         // actual
-        var xScale_infant_migrate = d3.scaleLinear().domain([-4420000, 2060000]).range([30, 1350]);
+        var xScale_migrate = d3.scaleLinear().domain([-4420000, 2060000]).range([30, 1350]);
         // projected
-        var yScale_infant_migrate = d3.scaleLinear().domain([-100000, 300000]).range([775, 15]);
+        var yScale_migrate = d3.scaleLinear().domain([-100000, 300000]).range([775, 15]);
         
-        var botAxis_migrate = d3.axisBottom(xScale_infant_migrate).ticks(8).tickSize(9);
-        var leftAxis_migrate = d3.axisLeft(yScale_infant_migrate).ticks(5).tickSize(9);
+        var botAxis_migrate = d3.axisBottom(xScale_migrate).ticks(8).tickSize(9);
+        var leftAxis_migrate = d3.axisLeft(yScale_migrate).ticks(5).tickSize(9);
 
         var country_group_inf_migrate = netmigration_svg.selectAll('g')
             .data(mideast)
@@ -1016,13 +892,11 @@
                 country_index = find_country_index(country.id)
                     
                 if (countryBank[country_index] != undefined) {
-                    migrate_x = xScale_infant_migrate(Number(countryBank[country_bank_index].NetMigration))
+                    migrate_x = xScale_migrate(Number(countryBank[country_bank_index].NetMigration))
                     migrants_projected = Number(countryData[country_index].NetMigration) *1000;
-                    migrate_y = yScale_infant_migrate(migrants_projected); 
+                    migrate_y = yScale_migrate(migrants_projected); 
                     
                 } else {
-                    console.log("cannot find")
-                    console.log(country_index)
                     migrate_x = 0;
                     migrate_y = 0;
                 }
@@ -1038,9 +912,9 @@
                 country_index = find_country_index(country.id)
                 country_bank_index = find_countryBank_index(country_name)
                 if (countryBank[country_index] != undefined) {
-                    migrate_x_text = xScale_infant_migrate(Number(countryBank[country_bank_index].NetMigration)) -10;
+                    migrate_x_text = xScale_migrate(Number(countryBank[country_bank_index].NetMigration)) -10;
                     migrants_projected = Number(countryData[country_index].NetMigration) *1000;
-                    migrate_y_text = yScale_infant_migrate(migrants_projected); 
+                    migrate_y_text = yScale_migrate(migrants_projected); 
                     if (country_name == "Israel"){
                         migrate_x_text -= 35;
                         migrate_y_text += 10;
@@ -1054,7 +928,6 @@
                 return "translate(" + migrate_x_text + "," + migrate_y_text + ")";
             })
             .text(function(country) {
-                console.log(country.id)
                 return id_to_country['' + country.id];
             });
         // add axeses
@@ -1074,13 +947,12 @@
         actual_vs_projected_plot.append("text")
             .text("Actual Net Migration from 2012")
             .attr("x", 90)
-            .attr("y", 522)
+            .attr("y", 562)
             .attr("font-size", "20px")
             .style("fill", "black")
             .attr("font-weight", "bold")
             .attr("alignment-baseline", "central");
-    }
-  
+    }  
      </script>
 </body>
 </html>
