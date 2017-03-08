@@ -5,16 +5,16 @@
     <title>Project One</title>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="http://d3js.org/topojson.v2.min.js"></script>
-  <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
 </head>
-<link href="https://fonts.googleapis.com/css?family=Fauna+One|Playfair+Display" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css?family=Fauna+One|Playfair+Display|Lato" rel="stylesheet">
 
 <style>
     svg { 
-    font-family: 'Ubuntu', sans-serif; 
+    font-family: 'Lato', sans-serif; 
     border: solid #ccc 1px;
     background-color: #ffffff; 
-  }
+    }
     body { background-color: #ffffff;}
     p {
       font-family: 'Ubuntu', sans-serif;
@@ -36,23 +36,30 @@
        align-items: center;
        -webkit-justify-content: center;
        justify-content: center;
-       margin-bottom: 10vh
+       margin-bottom: 4vh;
     }
 
     h1 {
-      font-family: 'Playfair Display';
-      font-size: 3em;
+        font-family: 'Playfair Display';
+        font-size: 3em;
     }
 
     h2 {
-      margin: 1em;
+        font-size: 2em;
+        margin: 1em;
     }
-    h3 {
+    .descriptions{
+        font-family: 'Lato';
         width: 800px;
     }
 
     #intro {
       height: 50vh;
+    }
+    section #explaination {
+        font-family: 'Lato';
+        font-size: 3em;
+        width: 3000px;
     }
 
     
@@ -62,27 +69,27 @@
         <h1>Migration in the Middle East: Prediction vs Actual</h1>
         <h2>By Sofie Cornelis, Quinn Halpin, and Weston Forster</h3>
     </section>
-    <section id="explaination">
-        <h3>In 2010, UN projected the 2015 net migration of Middle Eastern countries. However things did not turn out as they expect. This project explores the predicted and actual data.</h3>
+    <section>
+        <p id="explaination">In 2010, UN projected the 2015 net migration of Middle Eastern countries. However, things did not turn out as they expect. This project explores the predicted and actual data.</p>
     </section>
     <section id="maps">
         <h2>Actual Net Migration recorded in the Middle East in 2012</h2>
     </section>
     <section id="predicted_barchart">
-        <h3>While this was how people actually moved throughout the Middle East the below compares the real data to the predicted data. While the UN is usually accurate about their predictions, they were far from correct.</h3>
+        <p class="descriptions">While this was how people actually moved throughout the Middle East the below compares the real data to the predicted data. While the UN is usually accurate about their predictions, they were far from correct.</p>
         
         <h2>UN Predicted Net Migration for the Middle East</h2>
     </section>
     <section id="actual_barchart">
-        <p>WES WIRTE ABOUT CHARTS HERE</p>
+        <p class="descriptions">WES WIRTE ABOUT CHARTS HERE</p>
         <h2>Actual Net Migration recorded in the Middle East</h2>
     </section>
 
     <section id="scatter">
         <h2>UN's Projected Net Migration vs the Actual Recorded Net Migration</h2>
-        <h3>
+        <p class="descriptions">
             In April of 2011, 5000 Refugees fleed harsh fighting in Talkalakh, Syria, sparking the Syrian Refugee Crisis. In June of 2011, the military seige of Jisr al-Shughour sparks a major flow of refugees into Turkey. By the end of 2011, Turkey had spent $15 million to set up six camps for thousands of Syrian refugees. Between
-        </h3>
+        </p>
     </section>
     <script type="text/javascript">
     var dataset, nestedData, rawData, countries, popAreaData, nestBankData, countryBank;
@@ -429,6 +436,7 @@
 
         //Add key for the Maps
         //gradient color scale
+        //This linear gradient was based on https://www.visualcinnamon.com/2016/05/smooth-color-legend-d3-svg-gradient.html
         var linearGradient = svgZoom.append("linearGradient")
             .attr("id", "linear-gradient");
 
@@ -534,6 +542,7 @@
 
         //Add key for the Maps
         //gradient color scale
+        //This linear gradient was based on https://www.visualcinnamon.com/2016/05/smooth-color-legend-d3-svg-gradient.html
         var linearGradient = svgZoom.append("linearGradient")
             .attr("id", "linear-gradient");
 
