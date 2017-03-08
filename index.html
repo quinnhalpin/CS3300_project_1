@@ -22,8 +22,6 @@
       color: black; 
       font-size:14pt;
     }
-  /*h1 {font-family: 'Ubuntu', sans-serif;}  */
-    
     section, div {
       font-family: 'Fauna One';
       display: -webkit-flex;
@@ -98,6 +96,7 @@
     var projection_out = d3.geoMercator().scale(300);
     var projection3 = d3.geoMercator().scale(300);
     var path_generator = d3.geoPath().projection(projection);
+    //create svgs
     var svg_map = d3.select("#maps").append("svg").attr("width", 800).attr("height", 800)
         .style("background", "#E2FCFF"); //makes the svg map background light blue;
     var svg_zoom = d3.select("#maps").append("svg").attr("width", 800).attr("height", 800)
@@ -279,8 +278,7 @@
     }
     id_to_ind = [48, 818, 364, 368, 376, 400, 414, 422, 512, 634, 682, 760, 784, 792, 887];
 
-    /* This function returns an array country_data containing an object for each country with fields of the 2015 data for each variable*/
-
+    /* The done function runs once all of the data has been unpacted then displays all the additions to the svgs*/
     function done_function(error, csv_data, bank_csv, world_json_data) {
         dataset = csv_data;
         bank_data = bank_csv;
@@ -295,7 +293,8 @@
             })
             .entries(bank_csv);
         
-        // Country bank has all values for net_Migration stored with index 0 being 1960 and index 57 being 2016. Most values are empty strings but all are defined.
+        // country_bank is the actual data from 2012 of migration
+        // It has all values for net_Migration stored with index 0 being 1960 and index 57 being 2016. Most values are empty strings but all are defined.
         country_bank = nest_bank_data.map(function(country) {
             var bank_result = {
                 Country: country.key
@@ -312,6 +311,7 @@
             return bank_result;
         });
         
+        //country_data contains an object for each country with fields of the predicted 2015 data for each variable
         country_data = nested_data.map(function(country) {
             var result = {
                 Country: country.key
@@ -343,16 +343,16 @@
         });
 
         var red_green = [
-            /*reds dark to light:*/
-            "#E21223", "#F71629", "#FF3535", "#F75B60", "#fff", //red leaves
-            /*green light to dark:*/
+            /*red colors from dark to light:*/
+            "#E21223", "#F71629", "#FF3535", "#F75B60", "#fff",
+            /*green colors light to dark:*/
             "#ABFF4F", "#29BF12"
-        ]; //green stay
+        ];
         var gray_colors = ['#d3d3d3', '#d3d3d3'];
         var color_scale_map = d3.scaleLinear().domain([-17, -50000, -6000, -300, 0, 655555.5, 2000003]).range(red_green);
         var grayScale = d3.scaleLinear().domain([0, 100]).range(gray_colors);
 
-        //----------------Add the zoomed out map svg----------------
+        //----------------Add the zoomed out map to svg----------------
         raw_data = world_json_data;
         countries = topojson.feature(raw_data, raw_data.objects.countries);
         id_in_dict = function(val, arr) {
@@ -417,13 +417,8 @@
             .style("stroke-width", 1);
 
         //Add key for the Maps
-        //gradient color scale
-<<<<<<< HEAD
         //This linear gradient was based on https://www.visualcinnamon.com/2016/05/smooth-color-legend-d3-svg-gradient.html
-        var linearGradient = svgZoom.append("linearGradient")
-=======
         var linear_gradient = svg_zoom.append("linearGradient")
->>>>>>> f4dba9110f5610eeb58405c3c2f6708df50ca993
             .attr("id", "linear-gradient");
 
         linear_gradient
@@ -483,7 +478,7 @@
             });
 
         svg_map.append("text")
-            .text("Most outgoing migration")
+            .text("Highest outgoing migration")
             .attr("x", 530)
             .attr("y", 645)
             .attr("font-size", "14px")
@@ -491,14 +486,14 @@
             .attr("alignment-baseline", "central");
 
         svg_map.append("text")
-            .text("Most incoming migration")
+            .text("Highest incoming migration")
             .attr("x", 530)
             .attr("y", 783)
             .attr("font-size", "14px")
             .style("fill", "black")
             .attr("alignment-baseline", "central");
 
-        //----------------Create the zoomed in map----------------
+        //----------------Add the zoomed in map to svg----------------
         var paths = svg_zoom.selectAll("path.country").data(countries.features);
         paths.enter().append("path").attr("class", "country")
             .merge(paths)
@@ -527,13 +522,8 @@
             });
 
         //Add key for the Maps
-        //gradient color scale
-<<<<<<< HEAD
         //This linear gradient was based on https://www.visualcinnamon.com/2016/05/smooth-color-legend-d3-svg-gradient.html
-        var linearGradient = svgZoom.append("linearGradient")
-=======
         var linear_gradient = svg_zoom.append("linear_gradient")
->>>>>>> f4dba9110f5610eeb58405c3c2f6708df50ca993
             .attr("id", "linear-gradient");
 
         linear_gradient
@@ -593,7 +583,7 @@
             });
 
         svg_zoom.append("text")
-            .text("Most outgoing migration")
+            .text("Highest outgoing migration")
             .attr("x", 60)
             .attr("y", 635)
             .attr("font-size", "14px")
@@ -601,16 +591,15 @@
             .attr("alignment-baseline", "central");
 
         svg_zoom.append("text")
-            .text("Most incoming migration rate")
+            .text("Highest incoming migration rate")
             .attr("x", 60)
             .attr("y", 773)
             .attr("font-size", "14px")
             .style("fill", "black")
             .attr("alignment-baseline", "central");
 
-        //----------------Create Bar Chart of Net Migration----------------
-
-        var x_scale = d3.scaleLinear().domain([0, 15]).range([90, 1085]);
+        //----------------Create Bar Chart of Predicted Net Migration----------------
+        var x_scale_predicted = d3.scaleLinear().domain([0, 15]).range([90, 1085]);
         var migration_scale = d3.scaleLinear().domain([-80000.4, 249999.6]).range([540, 40]);
 
         //add axis and labels
@@ -619,14 +608,14 @@
         plot.append("g").call(yAxis).attr("transform", "translate(60,0)").style("opacity", 0.75);
 
         svg_chart.append("text")
-            .text("Most incoming migration")
+            .text("Highest incoming migration")
             .attr("x", 15)
             .attr("y", migration_scale(260000))
             .attr("font-size", "20px")
             .style("fill", "black")
             .attr("alignment-baseline", "central");
         svg_chart.append("text")
-            .text("Most outgoing migration")
+            .text("Highest outgoing migration")
             .attr("x", 15)
             .attr("y", migration_scale(-110000))
             .attr("font-size", "20px")
@@ -657,11 +646,12 @@
         country_data.forEach(function(d) {
             if (d.Country in country_id) {
                 y2 = migration_scale(d.Net_Migration*1000);
+                //countries with negative migration
                 if (d.Net_Migration < 1) {
                     svg_chart.append("line")
-                        .attr("x1", x_scale(i))
+                        .attr("x1", x_scale_predicted(i))
                         .attr("y1", migration_scale(0))
-                        .attr("x2", x_scale(i))
+                        .attr("x2", x_scale_predicted(i))
                         .attr("y2", y2)
                         .style("stroke", "#E21223")
                         .style("stroke-width", 25)
@@ -669,16 +659,16 @@
 
                     svg_chart.append("text")
                         .text(country_id[d.Country].name)
-                        .attr("x", x_scale(i))
+                        .attr("x", x_scale_predicted(i))
                         .attr("y", y2 + 15)
                         .attr("font-size", "14px")
                         .style("fill", "black")
                         .attr("text-anchor", "middle");
                 } else if (d.Country == "ARE") {
                     svg_chart.append("line")
-                        .attr("x1", x_scale(i))
+                        .attr("x1", x_scale_predicted(i))
                         .attr("y1", migration_scale(0))
-                        .attr("x2", x_scale(i))
+                        .attr("x2", x_scale_predicted(i))
                         .attr("y2", y2)
                         .style("stroke", "#29BF12")
                         .style("stroke-width", 25)
@@ -686,16 +676,18 @@
 
                     svg_chart.append("text")
                         .text(country_id[d.Country].name)
-                        .attr("x", x_scale(i) - 6)
+                        .attr("x", x_scale_predicted(i) - 6)
                         .attr("y", y2 - 10)
                         .attr("font-size", "14px")
                         .style("fill", "black")
                         .attr("text-anchor", "middle");
-                } else {
+                }
+                //countries with positive migration
+                else {
                     svg_chart.append("line")
-                        .attr("x1", x_scale(i))
+                        .attr("x1", x_scale_predicted(i))
                         .attr("y1", migration_scale(0))
-                        .attr("x2", x_scale(i))
+                        .attr("x2", x_scale_predicted(i))
                         .attr("y2", y2)
                         .style("stroke", "#29BF12")
                         .style("stroke-width", 25)
@@ -703,7 +695,7 @@
 
                     svg_chart.append("text")
                         .text(country_id[d.Country].name)
-                        .attr("x", x_scale(i))
+                        .attr("x", x_scale_predicted(i))
                         .attr("y", y2 - 10)
                         .attr("font-size", "14px")
                         .style("fill", "black")
@@ -713,8 +705,8 @@
             }
         });
 
-
-        var x_scale = d3.scaleLinear().domain([0, 15]).range([90, 1085]);
+        //----------------Create Bar Chart of Actual Net Migration----------------
+        var x_scale_actual_chart = d3.scaleLinear().domain([0, 15]).range([90, 1085]);
         var migration_scale_actual = d3.scaleLinear().domain([-4029996, 2000003]).range([850, 40]);
 
         //add axis and labels
@@ -723,7 +715,7 @@
         plot.append("g").call(yAxis).attr("transform", "translate(60,0)").style("opacity", 0.75);
 
         svg_chart_actual.append("text")
-            .text("Most incoming migration")
+            .text("Highest incoming migration")
             .attr("x", 15)
             .attr("y", migration_scale_actual(2150000))
             .attr("font-size", "20px")
@@ -731,7 +723,7 @@
             .attr("alignment-baseline", "central");
 
         svg_chart_actual.append("text")
-            .text("Most outgoing migration")
+            .text("Highest outgoing migration")
             .attr("x", 15)
             .attr("y", migration_scale_actual(-4250000))
             .attr("font-size", "20px")
@@ -747,31 +739,33 @@
             .style("stroke", "black")
             .style("stroke-width", .75)
             .style("opacity", 0.75);
+
         var l = 0;
         country_bank.forEach(function(d) {
             if (d.ThreeCode in country_id) {
                 y2 = migration_scale_actual(d.Net_Migration);
-               if (d.Net_Migration < 1) {
+                //countries with negative migration
+                if (d.Net_Migration < 1) {
                     svg_chart_actual.append("line")
-                        .attr("x1", x_scale(l))
+                        .attr("x1", x_scale_actual_chart(l))
                         .attr("y1", migration_scale_actual(0))
-                        .attr("x2", x_scale(l))
+                        .attr("x2", x_scale_actual_chart(l))
                         .attr("y2", y2)
                         .style("stroke", "#E21223")
                         .style("stroke-width", 25)
                         .style("opacity", 0.75);
                     svg_chart_actual.append("text")
                         .text(country_id[d.ThreeCode].name)
-                        .attr("x", x_scale(l)+5)
+                        .attr("x", x_scale_actual_chart(l)+5)
                         .attr("y", y2 + 15)
                         .attr("font-size", "13px")
                         .style("fill", "black")
                         .attr("text-anchor", "middle");
                 }else if (d.Country == "ARE") {
                     svg_chart_actual.append("line")
-                        .attr("x1", x_scale(i))
+                        .attr("x1", x_scale_actual_chart(i))
                         .attr("y1", migration_scale_actual(0))
-                        .attr("x2", x_scale(i))
+                        .attr("x2", x_scale_actual_chart(i))
                         .attr("y2", y2)
                         .style("stroke", "#29BF12")
                         .style("stroke-width", 25)
@@ -779,17 +773,18 @@
 
                     svg_chart_actual.append("text")
                         .text(country_id[d.ThreeCode].name)
-                        .attr("x", x_scale(i) +5)
+                        .attr("x", x_scale_actual_chart(i) +5)
                         .attr("y", y2 - 25)
                         .attr("font-size", "9px")
                         .style("fill", "black")
                         .attr("text-anchor", "middle");
                 }
-               else {
+                //countries with positive migration
+                else {
                     svg_chart_actual.append("line")
-                        .attr("x1", x_scale(l))
+                        .attr("x1", x_scale_actual_chart(l))
                         .attr("y1", migration_scale_actual(0))
-                        .attr("x2", x_scale(l))
+                        .attr("x2", x_scale_actual_chart(l))
                         .attr("y2", y2)
                         .style("stroke", "#29BF12")
                         .style("stroke-width", 25)
@@ -797,7 +792,7 @@
 
                     svg_chart_actual.append("text")
                         .text(country_id[d.ThreeCode].name)
-                        .attr("x", x_scale(l)+5)
+                        .attr("x", x_scale_actual_chart(l)+5)
                         .attr("y", y2 - 10)
                         .attr("font-size", "13px")
                         .style("fill", "black")
