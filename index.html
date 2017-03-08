@@ -497,13 +497,6 @@
             .attr("id", function(country) {
                 return country.id;
             })
-            .style("stroke", function(country, ind) {
-                for (var i = banned_id.length - 1; i >= 0; i--) {
-                    if (country.id == banned_id[i]) {
-                        return "#FFAE19";
-                    }
-                }
-            })
             .style("stroke-width", "3px")
             .style("fill", function(country, ind) {
                 for (var i = 0; i < countryData.length; i++) {
@@ -564,6 +557,10 @@
         linearGradient.selectAll("stop")
             .data([{
                     offset: "0%",
+                    color: "#8B0000"
+                },
+                {
+                    offset: "3%",
                     color: "#E21223"
                 },
                 {
@@ -587,12 +584,8 @@
                     color: "#ABFF4F"
                 },
                 {
-                    offset: "97%",
-                    color: "#29BF12"
-                },
-                {
                     offset: "100%",
-                    color: "#092B03"
+                    color: "#29BF12"
                 }
             ])
             .enter().append("stop")
@@ -619,21 +612,6 @@
             .style("fill", "black")
             .attr("alignment-baseline", "central");
 
-        svgMap.append("rect")
-            .attr("x", 500)
-            .attr("y", 610)
-            .attr("width", 20)
-            .attr("height", 10)
-            .style("fill", "#FFAE19");
-
-        svgMap.append("text")
-            .text("Countries banned by Trump")
-            .attr("x", 530)
-            .attr("y", 615)
-            .attr("font-size", "14px")
-            .style("fill", "black")
-            .attr("alignment-baseline", "central");
-
         //----------------Create the zoomed in map----------------
         var paths = svgZoom.selectAll("path.country").data(countries.features);
         paths.enter().append("path").attr("class", "country")
@@ -645,13 +623,6 @@
             })
             .attr("id", function(country) {
                 return country.id;
-            })
-            .style("stroke", function(country, ind) {
-                for (var i = banned_id.length - 1; i >= 0; i--) {
-                    if (country.id == banned_id[i]) {
-                        return "#FFAE19";
-                    }
-                }
             })
             .style("stroke-width", "4px")
             .style("fill", function(country, ind) {
@@ -691,6 +662,10 @@
         linearGradient.selectAll("stop")
             .data([{
                     offset: "0%",
+                    color: "#8B0000"
+                },
+                {
+                    offset: "3%",
                     color: "#E21223"
                 },
                 {
@@ -714,13 +689,9 @@
                     color: "#ABFF4F"
                 },
                 {
-                    offset: "97%",
-                    color: "#29BF12"
-                },
-                {
                     offset: "100%",
-                    color: "#092B03"
-                }
+                    color: "#29BF12"
+                }               
             ])
             .enter().append("stop")
             .attr("offset", function(d) {
@@ -742,21 +713,6 @@
             .text("Hihgest incoming migration rate")
             .attr("x", 60)
             .attr("y", 773)
-            .attr("font-size", "14px")
-            .style("fill", "black")
-            .attr("alignment-baseline", "central");
-
-        svgZoom.append("rect")
-            .attr("x", 30)
-            .attr("y", 600)
-            .attr("width", 20)
-            .attr("height", 10)
-            .style("fill", "#FFAE19");
-
-        svgZoom.append("text")
-            .text("Countries banned by Trump")
-            .attr("x", 60)
-            .attr("y", 605)
             .attr("font-size", "14px")
             .style("fill", "black")
             .attr("alignment-baseline", "central");
