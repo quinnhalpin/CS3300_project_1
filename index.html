@@ -96,9 +96,9 @@
     var projection3 = d3.geoMercator().scale(300);
     var pathGenerator = d3.geoPath().projection(projection);
     var svgMap = d3.select("#p1").append("svg").attr("width", 800).attr("height", 800)
-        .style("background", "#FCFEFF"); //makes the svg map background light blue;
+        .style("background", "#E2FCFF"); //makes the svg map background light blue;
     var svgZoom = d3.select("#p1").append("svg").attr("width", 800).attr("height", 800)
-        .style("background", "#FCFEFF"); //makes the svg map background light blue;
+        .style("background", "#E2FCFF"); //makes the svg map background light blue;
     var svgChart = d3.select("#p2").append("svg").attr("width", 1200).attr("height", 550).style("background", "#FCFEFF");
     var svgChartActual = d3.select("#p2_actual").append("svg").attr("width", 1200).attr("height", 900).style("background", "#FCFEFF");
     var netmigration_svg = d3.select("#p_scatter").append("svg").attr("width", 1400).attr("height", 800)
