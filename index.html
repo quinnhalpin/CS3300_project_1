@@ -74,7 +74,9 @@
         <h2>Observed Net Migration recorded in the Middle East in 2012</h2>
     </section>
     <section id="predicted_barchart">
-        <p class="descriptions">These maps show how people actually moved throughout the Middle East. The below charts compare the observed migration to the predicted data. The U.N. has a reputation for accurate predictions, but in this case they were far from correct.</p>
+        <p class="descriptions">
+        Note, the arrow represents the highest gradient of migration occuried from people moving from Syria to Turkey in 2012.
+        These maps show how people actually moved throughout the Middle East. The below charts compare the observed migration to the predicted data. The U.N. has a reputation for accurate predictions, but in this case they were far from correct.</p>
         
         <h2>UN Predicted Net Migration for the Middle East</h2>
     </section>
@@ -240,24 +242,7 @@
             "id": 736
         }
     }
-    id_to_acry = {
-        "48": "BHR",
-        "818": "EGY",
-        "364": "IRN",
-        "368": "IRQ",
-        "376": "ISR",
-        "400": "JOR",
-        "414": "KWT",
-        "422": "LBN",
-        "512": "OMN",
-        "275": "PSE",
-        "634": "QAT",
-        "682": "SAU",
-        "760": "SYR",
-        "784": "ARE",
-        "792": "TUR",
-        "887": "YEM",
-    }
+    
     id_to_country = {
         "48": "Bahrain",
         "818": "Egypt",
@@ -538,6 +523,12 @@
             .attr("width", 20)
             .attr("height", 150)
             .style("fill", "url(#linear-gradient)");
+        // used svg points for an arrow from a wikipiedia commons
+        svg_zoom.append("polygon")
+            .attr("points","902.25049,222.98633 233.17773,222.98633 233.17773,364.71875 0,182.35938 233.17773,0 233.17773,141.73242 902.25049,141.73242 902.25049,222.98633")
+            .attr("transform", "rotate(45) translate(300,-100) scale(.08)")
+            .attr("fill","yellow")
+
 
 
         linear_gradient.selectAll("stop")
@@ -598,6 +589,7 @@
             .style("fill", "black")
             .attr("alignment-baseline", "central");
 
+
         //----------------Create Bar Chart of Predicted Net Migration----------------
         var x_scale_predicted = d3.scaleLinear().domain([0, 15]).range([90, 1085]);
         var migration_scale = d3.scaleLinear().domain([-80000.4, 249999.6]).range([540, 40]);
@@ -631,7 +623,7 @@
             .style("stroke", "black")
             .style("stroke-width", .75)
             .style("opacity", 0.75);
-        
+
 
         //Sort the country_data by the net migration
         country_data.sort(function(a, b) {
